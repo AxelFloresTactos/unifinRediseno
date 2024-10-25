@@ -9163,8 +9163,15 @@ validaReqUniclickInfo: function () {
                 var asesorLeasingId = selfModalAltaPO.model.get('user_id_c');
                 var currentUserId =  App.user.id;
 
+                if( data.bloqueo_cartera_c || data.bloqueo2_c || data.bloqueo3_c ){
+                    app.alert.show('cuentaBloqueada', {
+                        level: 'error',
+                        messages: 'Acción no disponible.<b>Cuenta Bloqueada</b>',
+                        autoClose: false
+                    });
+                }
                 //Si el usuario logueado es igual al Director comercial y además ya se creó el PO, se muestra pantalla con botones para aprobar y rechazar
-                if( (data.po_creado_c == 1 && data.id_dir_comercial_aprueba_c == currentUserId ) || currentUserId == asesorLeasingId ){
+                else if( (data.po_creado_c == 1 && data.id_dir_comercial_aprueba_c == currentUserId ) || currentUserId == asesorLeasingId ){
                     app.drawer.open({
                         layout: 'layout-alta-po',
                         context: {
