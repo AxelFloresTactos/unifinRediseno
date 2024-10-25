@@ -154,7 +154,8 @@ class ObtenerRelacionesAltaPO extends SugarApi
 
     public function generaRegistroPO($api, $args){
         $idRegistro = $args['idRegistroRelacion'];
-
+        $idAsesorCuentaPrincipal = $args['idAsesorCuentaPrincipal'];
+        
         try{
             $beanCuenta = BeanFactory::getBean('Accounts', $idRegistro, array('disable_row_level_security' => true));
 
@@ -177,7 +178,7 @@ class ObtenerRelacionesAltaPO extends SugarApi
                 if( isset($telefonos['celular']) )  $telCelular = $telefonos['celular'];
             }
 
-            $idNuevoPO = $this->crearPO( $nombre, $paterno, $materno, $email, $telCasa, $telTrabajo, $telCelular, $rfc, $idAsesor );
+            $idNuevoPO = $this->crearPO( $nombre, $paterno, $materno, $email, $telCasa, $telTrabajo, $telCelular, $rfc, $idAsesorCuentaPrincipal );
 
             return array(
                 "status" => "ok",

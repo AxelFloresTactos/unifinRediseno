@@ -106,6 +106,7 @@
         console.log("ALTA PO");
         //Validar que se haya seleccionado un checkbox
         var idRelacionSeleccionada = this.getIdRelacionSeleccionada();
+        var idAsesorCuentaPrincipal = contextAltaPO.model.get('user_id_c');
 
         if( idRelacionSeleccionada == "" ){
 
@@ -119,7 +120,8 @@
 
             console.log("SE PROCEDE A CREAR UN PÚBLICO OBJETIVO");
             var body={
-                "idRegistroRelacion" : idRelacionSeleccionada
+                "idRegistroRelacion" : idRelacionSeleccionada,
+                "idAsesorCuentaPrincipal" : idAsesorCuentaPrincipal
             }
             app.alert.show('creacionPO', {
                 level: 'process',
