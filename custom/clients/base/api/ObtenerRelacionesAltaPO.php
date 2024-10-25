@@ -163,6 +163,7 @@ class ObtenerRelacionesAltaPO extends SugarApi
             $materno = $beanCuenta->apellidomaterno_c;
             $email = $beanCuenta->email1;
             $rfc = $beanCuenta->rfc_c;
+            $idAsesor = $beanCuenta->user_id_c;
 
             $telCasa = "";
             $telTrabajo = "";
@@ -176,7 +177,7 @@ class ObtenerRelacionesAltaPO extends SugarApi
                 if( isset($telefonos['celular']) )  $telCelular = $telefonos['celular'];
             }
 
-            $idNuevoPO = $this->crearPO( $nombre, $paterno, $materno, $email, $telCasa, $telTrabajo, $telCelular, $rfc );
+            $idNuevoPO = $this->crearPO( $nombre, $paterno, $materno, $email, $telCasa, $telTrabajo, $telCelular, $rfc, $idAsesor );
 
             return array(
                 "status" => "ok",
@@ -226,7 +227,7 @@ class ObtenerRelacionesAltaPO extends SugarApi
 
     }
 
-    public function crearPO( $nombre, $paterno, $materno, $email, $telCasa, $telTrabajo, $telCelular, $rfc ){
+    public function crearPO( $nombre, $paterno, $materno, $email, $telCasa, $telTrabajo, $telCelular, $rfc, $idAsesor ){
         $GLOBALS['log']->fatal( "CREANDO PO" );
         $beanProspect = BeanFactory::newBean("Prospects");
 
@@ -237,6 +238,7 @@ class ObtenerRelacionesAltaPO extends SugarApi
         $beanProspect->phone_home = $telCasa;
         $beanProspect->phone_work = $telTrabajo;
         $beanProspect->phone_mobile = $telCelular;
+        $beanProspect->assigned_user_id = $idAsesor;
         //$beanProspect->rfc_c = $rfc;
 
 
