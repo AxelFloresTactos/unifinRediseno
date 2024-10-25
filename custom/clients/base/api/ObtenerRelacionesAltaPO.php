@@ -488,7 +488,7 @@ class ObtenerRelacionesAltaPO extends SugarApi
         $mailHTML = '<p align="justify"><font face="verdana" color="#635f5f">Estimado/a '.$nombreDirectorComercial.',<br><br>
             Se requiere tu VoBo para la creación de un nuevo público objetivo en la cuenta de <br>
             '.$htmlLink.' para que el cliente pueda registrarse en Unileasing 2.0.<br>
-            Para hacerlo, favor de elegir la opción <b>Alta de PO</b> el el menú de opciones del registro.<br><br>
+            Para hacerlo, favor de elegir la opción <b>Alta de PO</b> en el menú de opciones del registro.<br><br>
             Refiere el siguiente motivo: '.$motivoCreacion.'
             <br><br>Si necesitas más información antes de aprobar, puedes solicitarla al asesor asignado.<br><br>
             Por favor, confirma tu decisión a la brevedad.
