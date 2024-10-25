@@ -68,27 +68,29 @@ class ObtenerRelacionesAltaPO extends SugarApi
                     $GLOBALS['log']->fatal( $rel->id );
                     
                     //Por cada cuenta relacionada, verificamos que no exista en Público Objetivo
-                    //account_id1_c
                     $beanCuentaRelacion = BeanFactory::retrieveBean('Accounts', $rel->account_id1_c , array('disable_row_level_security' => true));
                     $emailCuenta = $beanCuentaRelacion->email1;
-
-                    $result = $this->verificaExistenciaEnPO($emailCuenta);
-                    $GLOBALS['log']->fatal( print_r($result,true) );
-                    $count = count($result);
-
-                    //Si no se encuentran registros, quiere decir que la cuenta aún no tiene un regidtro de PO
-                    if( $count == 0 ){
-                        $arrayRelacion = array();
-                        $arrayRelacion['idRelacion'] = $rel->id;
-                        $arrayRelacion['idCuenta'] = $beanCuentaRelacion->id;
-                        $arrayRelacion['nombre'] = $beanCuentaRelacion->name;
-                        $arrayRelacion['email'] = $beanCuentaRelacion->email1;
-                        $arrayRelacion['relaciones'] = $rel->relaciones_activas;
-                        array_push( $arrRelaciones, $arrayRelacion);
-                    }
-
-                    //vVerificamos que no exista el email en Prospects
+                    $regimenFiscal = $beanCuentaRelacion->tipodepersona_c;
                     
+                    //Solo verificar personas fisicas
+                    if( $regimenFiscal == 'Persona Fisica' ){
+
+                        $result = $this->verificaExistenciaEnPO($emailCuenta);
+                        $GLOBALS['log']->fatal( print_r($result,true) );
+                        $count = count($result);
+    
+                        //Si no se encuentran registros, quiere decir que la cuenta aún no tiene un registro de PO
+                        if( $count == 0 ){
+                            $arrayRelacion = array();
+                            $arrayRelacion['idRelacion'] = $rel->id;
+                            $arrayRelacion['idCuenta'] = $beanCuentaRelacion->id;
+                            $arrayRelacion['nombre'] = $beanCuentaRelacion->name;
+                            $arrayRelacion['email'] = $beanCuentaRelacion->email1;
+                            $arrayRelacion['relaciones'] = $rel->relaciones_activas;
+                            array_push( $arrRelaciones, $arrayRelacion);
+                        }
+                    }
+                                        
                 }
             }
         }
@@ -109,6 +111,7 @@ class ObtenerRelacionesAltaPO extends SugarApi
         $sql->select(array('id', 'clean_name_c'));
         $sql->from($prospectsBean);
         $sql->where()->equals('email1', $email);
+        $sql->where()->equals('excluye_campana_c', 0);
 
         $result = $sql->execute();
         return $result;
@@ -331,7 +334,7 @@ class ObtenerRelacionesAltaPO extends SugarApi
 
                 $this->sendEmailEnviaRespuestaDirector( $emailAsesor, "Solicitud rechazada: Creación de nuevo PO – ".$nameRegistro, $bodyHtml );
 
-                $this->cleanFieldsResumen( $idRegistro );
+                //$this->cleanFieldsResumen( $idRegistro );
 
                 $mensaje = "Se ha rechazado la creación del registro correctamente";
 
@@ -484,7 +487,8 @@ class ObtenerRelacionesAltaPO extends SugarApi
 
         $mailHTML = '<p align="justify"><font face="verdana" color="#635f5f">Estimado/a '.$nombreDirectorComercial.',<br><br>
             Se requiere tu VoBo para la creación de un nuevo público objetivo en la cuenta de <br>
-            '.$htmlLink.' para que el cliente pueda registrarse en Unileasing 2.0.<br><br>
+            '.$htmlLink.' para que el cliente pueda registrarse en Unileasing 2.0.<br>
+            Para hacerlo, favor de elegir la opción <b>Alta de PO</b> el el menú de opciones del registro.<br><br>
             Refiere el siguiente motivo: '.$motivoCreacion.'
             <br><br>Si necesitas más información antes de aprobar, puedes solicitarla al asesor asignado.<br><br>
             Por favor, confirma tu decisión a la brevedad.

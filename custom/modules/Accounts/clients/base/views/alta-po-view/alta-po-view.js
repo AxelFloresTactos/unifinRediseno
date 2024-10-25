@@ -74,11 +74,14 @@
                             }else{
                                 app.alert.show('sinRelaciones', {
                                     level: 'info',
-                                    messages: 'Este registro no cuenta con Relaciones',
+                                    messages: 'Este registro no cuenta con Relaciones que <b>NO</b> existan en Público Objetivo',
                                     autoClose: true
                                 });
 
-                                contextAltaPO.cancelarAltaPO();
+                                $('.modal-footer-alta-po').hide();
+                                $('.modal-footer-link').attr('style', 'margin: 40px');
+                                $('.mainTableAltaPO').hide()
+                                //contextAltaPO.cancelarAltaPO();
                             }
                         }
                     });
