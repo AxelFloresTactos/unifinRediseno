@@ -140,7 +140,7 @@
                     if( data['status'] == 'ok' ){
                         app.alert.show('poCreado', {
                             level: 'success',
-                            messages: data['msj'],
+                            messages: data['msj'] + ": " + '<a href="#Prospects/' + data['idRegistro'] + '" target= "_blank"> ' + data['nameRegistro'] + '  </a>',
                             autoClose: false
                         });
 
