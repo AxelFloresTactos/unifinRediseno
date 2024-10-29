@@ -2752,4 +2752,52 @@ where rfc_c = '{$bean->rfc_c}' and
 
     }
 
+    public function setEmailPrincipal( $bean = null, $event = null, $args = null ){
+
+        $newPrimaryEmail = $bean->email1;
+
+        $GLOBALS['log']->fatal("EVALUANDO EMAIL PRINCIPAL");
+
+        if ( $GLOBALS['service']->platform != 'base' ) {
+            if( $bean->fetched_row['email1'] != $bean->email1 ){
+                $GLOBALS['log']->fatal("El email cambió");
+                
+                // Recuperar todas las direcciones de email asociadas
+                $existingEmails = $bean->emailAddress->getAddressesByGUID($bean->id, 'Accounts');
+                //$GLOBALS['log']->fatal( print_r($existingEmails,true) );
+
+                $emailAddresses = [];
+
+                // Verificar si el nuevo email ya existe y guardarlo como principal
+                $emailExists = false;
+                foreach ($existingEmails as &$email) {
+                    if ($email['email_address'] === $newPrimaryEmail) {
+                        $email['primary_address'] = true;
+                        $emailExists = true;
+                    } else {
+                        $email['primary_address'] = false; // Marcar los demás como secundarios
+                    }
+                    $emailAddresses[] = $email;
+                }
+
+                // Si el nuevo email no existe, agrégalo como el principal
+                if (!$emailExists) {
+                    $emailAddresses[] = [
+                        'email_address' => $newPrimaryEmail,
+                        'primary_address' => true,
+                        'invalid_email' => false,
+                        'opt_out' => false,
+                    ];
+                }
+
+                // Asignar el nuevo conjunto de correos electrónicos a la cuenta
+                $bean->emailAddress->addresses = $emailAddresses;
+                $bean->emailAddress->save($bean->id, $bean->module_name);
+
+
+            }
+        }
+
+    }
+
 }
