@@ -205,9 +205,9 @@
                 msjError += '<br><b>Solo números son permitidos</b>';
             }
             //Valida longitud
-            if (valor4.length < 8) {
+            if (valor4.length !== 10) {
                 faltantes++;
-                msjError += '<br><b>Debe contener 8 o más dígitos</b>';
+                msjError += '<br><b>Debe contener 10 dígitos</b>';
             }
 
             //Valida números repetidos
