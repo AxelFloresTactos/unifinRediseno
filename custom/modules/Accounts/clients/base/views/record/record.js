@@ -3984,8 +3984,8 @@
                     msjError += '<br>-Solo números son permitidos';
                 }
                 //Valida longitud
-                if (valor4.length < 8) {
-                    msjError += '<br>-Debe contener 8 o más dígitos';
+                if (valor4.length !== 10) {
+                    msjError += '<br>-Debe contener 10 dígitos';
                 }
                 //Valida números repetidos
                 if (valor4.length > 1) {
