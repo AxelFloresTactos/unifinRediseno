@@ -178,12 +178,13 @@ class ObtenerRelacionesAltaPO extends SugarApi
                 if( isset($telefonos['celular']) )  $telCelular = $telefonos['celular'];
             }
 
-            $idNuevoPO = $this->crearPO( $nombre, $paterno, $materno, $email, $telCasa, $telTrabajo, $telCelular, $rfc, $idAsesorCuentaPrincipal );
+            $dataProspect = $this->crearPO( $nombre, $paterno, $materno, $email, $telCasa, $telTrabajo, $telCelular, $rfc, $idAsesorCuentaPrincipal );
 
             return array(
                 "status" => "ok",
                 "msj" => "Registro de PO creado correctamente",
-                "idRegistro" => $idNuevoPO
+                "idRegistro" => $dataProspect[0],
+                "nameRegistro" => $dataProspect[1]
                 );
 
         }catch (Exception $e){
@@ -245,7 +246,7 @@ class ObtenerRelacionesAltaPO extends SugarApi
 
         $beanProspect->save();
 
-        return $beanProspect->id;
+        return array($beanProspect->id, $beanProspect->name);
 
     }
 
