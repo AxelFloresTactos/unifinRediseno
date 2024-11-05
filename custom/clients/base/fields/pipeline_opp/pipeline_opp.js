@@ -198,9 +198,14 @@
             $('#PA').addClass('done');
             //Valida subetapa
             if (subetapa=="N") {
-                $("#SE4").removeClass('ocult');
-                $('#SE4').addClass('success');
-                $("#SE4").html("Autorizada");
+                $("#SE5").removeClass('ocult');
+                $('#SE5').addClass('success');
+                $("#SE5").html("Autorizada");
+            }
+            if (subetapa=="VF") {
+                $("#SE5").removeClass('ocult');
+                $('#SE5').addClass('success');
+                $("#SE5").html("Validación de firmas de formatos Unifin");
             }
         }
         if (etapa=="R"){
