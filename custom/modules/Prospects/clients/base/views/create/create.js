@@ -25,7 +25,7 @@
         this.model.addValidationTask('change:email', _.bind(this.expmail, this));
         //this.model.addValidationTask('checkCreateRecord', _.bind(this.checkCreateRecord, this));
         //Validation task que muestra modal sobre duplicados
-        this.model.addValidationTask('check_duplicados_modal', _.bind(this.check_duplicados_modal, this));
+        //this.model.addValidationTask('check_duplicados_modal', _.bind(this.check_duplicados_modal, this));
         this.events['keydown [name=ventas_anuales_c]'] = 'checkInVentas';
         this.on('render', this._hidechkLeadCancelado, this);
         this.model.addValidationTask('setCleanName', _.bind(this.cleanName, this));

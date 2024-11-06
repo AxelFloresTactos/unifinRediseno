@@ -186,7 +186,7 @@
         this.model.addValidationTask('dataOrigen',_.bind(this.dataOrigen, this));
 		this.model.addValidationTask('SOCInicio', _.bind(this.SOCInicio, this));
 		this.model.addValidationTask('negocio_c', _.bind(this.negocios, this));
-		//this.model.addValidationTask('validaCreacionLeasing', _.bind(this.validaCreacionLeasing, this));
+		this.model.addValidationTask('validaCreacionLeasing', _.bind(this.validaCreacionLeasing, this));
     },
 
     /* producto_financiero: function () {
@@ -2622,8 +2622,8 @@
 
     //En la creación no se posible crear solicitudes con el Producto Leasing
     validaCreacionLeasing: function (fields, errors, callback) {
-
-        if( this.model.get('tipo_producto_c') == '1' ){
+        var leasingHabilitado = App.lang.getAppListStrings('habilita_creacion_opt_list')[1] == '1' ? true : false;
+        if( this.model.get('tipo_producto_c') == '1' && !leasingHabilitado){
             app.alert.show("noLeasing", {
               level: "error",
               title: "Error",

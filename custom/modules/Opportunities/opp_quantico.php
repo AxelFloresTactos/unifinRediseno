@@ -46,7 +46,7 @@ class IntegracionQuantico
         $generaSolicitud = ($args['isUpdate'] == 1 && $bean->tct_etapa_ddw_c == 'SI' && $bean->producto_financiero_c!="0" &&$bean->producto_financiero_c!="") ? true : $generaSolicitud;
         $generaSolicitud = ($args['isUpdate'] == 1 && $bean->tct_etapa_ddw_c == 'SI' && $bean->tipo_producto_c == '1' && $bean->negocio_c == '3') ? true : $generaSolicitud;
 		    $generaSolicitud = ($args['isUpdate'] == 1 && $bean->admin_cartera_c) ? true : $generaSolicitud;
-        $generaSolicitud = ($args['isUpdate'] == 1 && $row['no_viable'] == '1') ? false: $generaSolicitud;
+        //$generaSolicitud = ($args['isUpdate'] == 1 && $row['no_viable'] == '1') ? false: $generaSolicitud;
         $generaSolicitud = $bean->tipo_producto_c == '14' ? false: $generaSolicitud;
 
         if ( ( ($bean->id_process_c != "" && $iniciaPUni2) || (!$iniciaPUni2) ) && $bean->idsolicitud_c != "" && $bean->quantico_id_c == "" && $generaSolicitud && !$bean->tct_oportunidad_perdida_chk_c) {
@@ -146,18 +146,18 @@ class IntegracionQuantico
             } else {
                 $GLOBALS['log']->fatal("Error al procesar la solicitud a Quantico, verifique información");
                 $GLOBALS['log']->fatal("Enviando notificación para bitácora de errores Quantico");
-				require_once("custom/clients/base/api/ErrorLogApi.php");
-				$apiErrorLog = new ErrorLogApi();
-				$args = array(
-					"integration"=> "Quantico: CreditRequestApi/PostRegister",
-					"system"=> "Quantico",
-					"parent_type"=> "Opportunities",
-					"parent_id"=> $bean->id,
-					"endpoint"=> $host,
-					"request"=> json_encode($body),
-					"response"=> json_encode($resultado)
-				);
-				$responseErrorLog = $apiErrorLog->setDataErrorLog(null, $args);
+                require_once("custom/clients/base/api/ErrorLogApi.php");
+                $apiErrorLog = new ErrorLogApi();
+                $args = array(
+                    "integration"=> "Quantico: CreditRequestApi/PostRegister",
+                    "system"=> "Quantico",
+                    "parent_type"=> "Opportunities",
+                    "parent_id"=> $bean->id,
+                    "endpoint"=> $host,
+                    "request"=> json_encode($body),
+                    "response"=> json_encode($resultado)
+                );
+                $responseErrorLog = $apiErrorLog->setDataErrorLog(null, $args);
             }
         }
         $GLOBALS['log']->fatal("Termina QuanticoIntegracion");
@@ -232,18 +232,18 @@ class IntegracionQuantico
             } else {
                 $GLOBALS['log']->fatal("Error al actualizar a Quantico");
                 $GLOBALS['log']->fatal("Enviando notificación para bitácora de errores Quantico");
-				require_once("custom/clients/base/api/ErrorLogApi.php");
-				$apiErrorLog = new ErrorLogApi();
-				$args = array(
-					"integration"=> "Quantico: CreditRequestApi/CancelCreditRequest",
-					"system"=> "Quantico",
-					"parent_type"=> "Opportunities",
-					"parent_id"=> $bean->id,
-					"endpoint"=> $host,
-					"request"=> json_encode($body),
-					"response"=> json_encode($resultado)
-				);
-				$responseErrorLog = $apiErrorLog->setDataErrorLog(null, $args);
+                require_once("custom/clients/base/api/ErrorLogApi.php");
+                $apiErrorLog = new ErrorLogApi();
+                $args = array(
+                    "integration"=> "Quantico: CreditRequestApi/CancelCreditRequest",
+                    "system"=> "Quantico",
+                    "parent_type"=> "Opportunities",
+                    "parent_id"=> $bean->id,
+                    "endpoint"=> $host,
+                    "request"=> json_encode($body),
+                    "response"=> json_encode($resultado)
+                );
+                $responseErrorLog = $apiErrorLog->setDataErrorLog(null, $args);
             }
         }
         $GLOBALS['log']->fatal('Finaliza QuanticoUpdate');
@@ -274,18 +274,18 @@ class IntegracionQuantico
             }else{
 
                 $GLOBALS['log']->fatal("Enviando notificación para bitácora de errores Quantico");
-				require_once("custom/clients/base/api/ErrorLogApi.php");
-				$apiErrorLog = new ErrorLogApi();
-				$args = array(
-					"integration"=> "Quantico: CreditRequestApi/ModifyFinantialCondition",
-					"system"=> "Quantico",
-					"parent_type"=> "Opportunities",
-					"parent_id"=> $bean->id,
-					"endpoint"=> $host,
-					"request"=> json_encode($body),
-					"response"=> json_encode($resultado)
-				);
-				$responseErrorLog = $apiErrorLog->setDataErrorLog(null, $args);
+                require_once("custom/clients/base/api/ErrorLogApi.php");
+                $apiErrorLog = new ErrorLogApi();
+                $args = array(
+                    "integration"=> "Quantico: CreditRequestApi/ModifyFinantialCondition",
+                    "system"=> "Quantico",
+                    "parent_type"=> "Opportunities",
+                    "parent_id"=> $bean->id,
+                    "endpoint"=> $host,
+                    "request"=> json_encode($body),
+                    "response"=> json_encode($resultado)
+                );
+                $responseErrorLog = $apiErrorLog->setDataErrorLog(null, $args);
 
             }
 

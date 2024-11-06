@@ -210,6 +210,7 @@ class clean_fields_class
 
     public function validarNumeros($input) {
         // Verifica si el string contiene solo números y tiene una longitud máxima de 10 dígitos
+	return true;
         if (preg_match('/^\d{1,10}$/', $input)) {
             return true;
         } else {
