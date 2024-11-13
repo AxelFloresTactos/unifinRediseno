@@ -230,7 +230,7 @@
                                 listColonia[i]['idColonia']=list_colonias[i].idColonia;
                                 listColonia[i]['nameColonia']=list_colonias[i].nameColonia;
                                 listColonia[i]['idCodigoPostal']=list_colonias[i].idCodigoPostal;
-
+                                listColonia[i]['idMunicipio']=list_colonias[i].idMunicipio;
                             }
                             cont_dir.nuevaDireccion.listColonia = listColonia;
                             cont_dir.nuevaDireccion.listColoniaFull = listColonia;
@@ -378,6 +378,7 @@
                                 listColonia[i]['idColonia']=list_colonias[i].idColonia;
                                 listColonia[i]['nameColonia']=list_colonias[i].nameColonia;
                                 listColonia[i]['idCodigoPostal']=list_colonias[i].idCodigoPostal;
+                                listColonia[i]['idMunicipio']=list_colonias[i].idMunicipio;
                             }
                             cont_dir.oDirecciones.direccion[index].listColonia = listColonia;
                             cont_dir.oDirecciones.direccion[index].listColoniaFull = listColonia;
@@ -507,9 +508,17 @@
             val = (val.length==1)? "00"+val:val;
             val = (val.length==2)? "0"+val:val;
         }
+        // for (var [key, value] of Object.entries(arr)) {
+        //     if (key.startsWith(val)) {
+        //       filtroLista[key]=value;
+        //     }
+        // }
+
+        //Mejora para actualizar la colonia por el Municipio
         for (var [key, value] of Object.entries(arr)) {
-            if (key.startsWith(val)) {
-              filtroLista[key]=value;
+            // Compara el idMunicipio
+            if (value.idMunicipio && value.idMunicipio.toString() === val) {
+                filtroLista[key] = value;
             }
         }
         return filtroLista;
