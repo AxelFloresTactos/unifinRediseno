@@ -74,6 +74,9 @@ class ConvertirPO extends SugarApi
 
                         $beanRelacion->save();
                     }
+                    //Se establece campo relacionado con la cuenta a la que se le genera relación de la Persona recuperada
+                    $beanPO->account_id2_c = $idCuentaRecuperada;
+                    $beanPO->save();
 
                     $response = array(
                         "status" => 200,
