@@ -82,6 +82,7 @@ class Prospects_AsignacionPO
                   and u.is_group=0
                   and (bc.vacaciones_c = 0 or bc.vacaciones_c is null)
                   and a.zona_geografica is not null
+                  and uc.posicion_operativa_c like '%^3^%'
                   order by u.last_name asc;";
                 $resultadoC = $db->query($query);
                 $countRows = 0;
