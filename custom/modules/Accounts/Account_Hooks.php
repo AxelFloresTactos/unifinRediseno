@@ -288,11 +288,13 @@ SQL;
                     $municipioName = $db->fetchByAssoc($querymunicipio);
                     */
 
-                    $id_postal=$direccion_row['postal'];
+                    $id_postal=$direccion_row['valCodigoPostal'];
+                    $id_colonia=$direccion_row['colonia'];
                     $GLOBALS['log']->fatal("POSTAL: ".$id_postal);
-                    $query_sepomex="SELECT * FROM dir_sepomex WHERE id='{$id_postal}'";
+                    $query_sepomex="SELECT * FROM dir_sepomex WHERE codigo_postal='{$id_postal}' and id_colonia='{$id_colonia}'";
                     $GLOBALS['log']->fatal("QUERY SEPOMEX");
                     $GLOBALS['log']->fatal($query_sepomex);
+                    $id_sepomex = '';
                     $result_sepomex = $db->query($query_sepomex);
                     while ($row = $GLOBALS['db']->fetchByAssoc($result_sepomex)) {
                         $namePais=$row['pais'];
@@ -306,6 +308,7 @@ SQL;
                         $idColonia=$row['id_colonia'];
                         $nameMunicipio=$row['municipio'];
                         $idMunicipio=$row['id_municipio'];
+                        $id_sepomex = $row['id'];
                     }
 
                     $direccion_completa = $direccion_row['calle'] . " " . $direccion_row['numext'] . " " . ($direccion_row['numint'] != "" ? "Int: " . $direccion_row['numint'] : "") . ", Colonia " . $nameColonia. ", Municipio " . $nameMunicipio;
@@ -367,7 +370,7 @@ SQL;
                     }
                     */
                     //Se genera relación entre la dirección y Sepomex
-                    $direccion->dir_sepomex_dire_direcciondir_sepomex_ida=$direccion_row['postal'];
+                    $direccion->dir_sepomex_dire_direcciondir_sepomex_ida=$id_sepomex;
 
                     $GLOBALS['log']->fatal(__FILE__ . " - " . __CLASS__ . "->" . __FUNCTION__ . " <" . $current_user->user_name . "> : DIRECCION NOMBRE: " . $direccion_completa);
                     $current_id_list[] = $direccion->id;
