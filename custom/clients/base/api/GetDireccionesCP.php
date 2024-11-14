@@ -189,7 +189,7 @@ WHERE cp.name = '{$cp}'";
             $arrPais=array('idPais'=>$idPais,'namePais'=>$namePais);
             $arrMunicipio=array('idMunicipio'=>$idMunicipio,'nameMunicipio'=>$nameMunicipio);
             $arrEstado=array('idEstado'=>$idEstado,'nameEstado'=>$nameEstado);
-            $arrColonia=array('idColonia'=>$idColonia,'nameColonia'=>$nameColonia,'idCodigoPostal'=>$row['idCP']);
+            $arrColonia=array('idColonia'=>$idColonia,'nameColonia'=>$nameColonia,'idCodigoPostal'=>$row['idCP'],'idMunicipio'=>$idMunicipio);
             //$arrColonia=array('idColonia'=>$idColonia,'nameColonia'=>$nameColonia);
             $arrCiudad=array('idCiudad'=>$idCiudad,'nameCiudad'=>$nameCiudad);
 
