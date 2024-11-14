@@ -1270,50 +1270,75 @@
 
 
     verificaDireccionSinSepomex: function(fields, errors, callback){
-
-        var tipoRegistroCuenta = this.model.get('tipo_registro_cuenta_c');
-        var tipoRelacion = this.model.get('tipo_relacion_c');
-        var tiposRegistrosSepomexRequerido = App.lang.getAppListStrings('valida_match_sepomex_tipo_list');
+      
+        const accountId = this.model.get('id');
         var tiposRelacionSepomexRequerido = App.lang.getAppListStrings('valida_match_sepomex_relacion_list');
+        var ids = Object.keys(tiposRelacionSepomexRequerido);
+        // Generar la cadena con la estructura requerida
+        var filterString = ids
+            .map((id, index) => `&filter[0][relaciones_activas][$in][${index}]=${id}`)
+            .join('');
+        //console.log(filterString);
+        // Resultado: "&filter[0][relaciones_activas][$in][0]=1&filter[0][relaciones_activas][$in][1]=2"
+        const endpoint = 'Accounts/'+accountId+'/link/accounts_rel_relaciones_1?fields=name,relaciones_activas'+filterString;
+        // /link/accounts_rel_relaciones_1?fields=name,relaciones_activas&filter[0][relaciones_activas][$in][0]=Contacto&filter[0][relaciones_activas][$in][1]=Contacto
+        
+        app.api.call('GET', app.api.buildURL(endpoint), null, {
+            success: function (data) {
+                var tipoRegistroCuenta = contexto_cuenta.model.get('tipo_registro_cuenta_c');
+                var tiposRegistrosSepomexRequerido = App.lang.getAppListStrings('valida_match_sepomex_tipo_list');
 
-        //Generamos arreglo con los tipos de Cuenta a los que se les debe pedir como requerido el llenado de sepomex
-        const keysTipoCuenta = Object.keys(tiposRegistrosSepomexRequerido);
-        const keysRelacionCuenta = Object.keys(tiposRelacionSepomexRequerido);
+                //Generamos arreglo con los tipos de Cuenta a los que se les debe pedir como requerido el llenado de sepomex
+                const keysTipoCuenta = Object.keys(tiposRegistrosSepomexRequerido);
 
-        const existeRelacionParaPedirRequerida = tipoRelacion.some(item => keysRelacionCuenta.includes(item));
-
-
-        if( keysTipoCuenta.includes(tipoRegistroCuenta) ||  existeRelacionParaPedirRequerida ){
-
-            var arrSinSepomex = [];
-            //Recorremos las direcciones para saber si alguna direccion no está homologada con Sepomex
-            for (let index = 0; index < cont_dir.oDirecciones.direccion.length; index++) {
-                const element = cont_dir.oDirecciones.direccion[index];
-                var valCodigoPostal = element.valCodigoPostal;
-
-                
-                if( element.hasOwnProperty('sinSepomex') && _.isEmpty(valCodigoPostal) ){
-                    arrSinSepomex.push(1);
+                let existeRelacionParaPedirRequerida = 0;
+                              
+                if (data.records && data.records.length > 0) {
+                    existeRelacionParaPedirRequerida = 1;
                 }
-            }
+                
+                if( keysTipoCuenta.includes(tipoRegistroCuenta) ||  existeRelacionParaPedirRequerida ){
 
-            if( arrSinSepomex.includes(1) ){
+                    var arrSinSepomex = [];
+                    //Recorremos las direcciones para saber si alguna direccion no está homologada con Sepomex
+                    for (let index = 0; index < cont_dir.oDirecciones.direccion.length; index++) {
+                        const element = cont_dir.oDirecciones.direccion[index];
+                        var valCodigoPostal = element.valCodigoPostal;
 
-                $("#row-advice-no-match p").css("color", "red");
+                        
+                        if( element.hasOwnProperty('sinSepomex') && _.isEmpty(valCodigoPostal) ){
+                            arrSinSepomex.push(1);
+                        }
+                    }
 
-                app.alert.show('no_sepomex_required', {
+                    if( arrSinSepomex.includes(1) ){
+
+                        $("#row-advice-no-match p").css("color", "red");
+
+                        app.alert.show('no_sepomex_required', {
+                            level: 'error',
+                            autoClose: false,
+                            messages: 'Favor de completar la dirección que no está homologada con sepomex'
+                        });
+            
+                        errors['account_direcciones_sin_sepomex'] = errors['account_direcciones_sin_sepomex'] || {};
+                        errors['account_direcciones_sin_sepomex'].required = true;
+
+                    }
+                }
+                callback(null, fields, errors);
+            },
+            error: function (error) {
+                app.alert.show('validation-error', {
                     level: 'error',
+                    messages: 'Hubo un error al validar los datos. Verifica la conexión o el endpoint.',
                     autoClose: false,
-                    messages: 'Favor de completar la dirección que no está homologada con sepomex'
                 });
-    
-                errors['account_direcciones_sin_sepomex'] = errors['account_direcciones_sin_sepomex'] || {};
-                errors['account_direcciones_sin_sepomex'].required = true;
+                console.error('Error:', error);
+                callback(null, fields, errors);
+            },
+        });
 
-            }
-        }
-
-        callback(null, fields, errors);
     },
 
     /**
