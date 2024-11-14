@@ -47,6 +47,9 @@ class Tel_Hooks{
         $phone_sanitized = substr($phone_sanitized, 0, 13);
 
         $bean->telefono = $phone_sanitized;
+
+        //SE AGREGA TELEFONO AL NAME
+        $bean->name = $bean->telefono;
     }
 
     public function insertaComunicaciónUNICS($bean = null, $event = null, $args = null){
