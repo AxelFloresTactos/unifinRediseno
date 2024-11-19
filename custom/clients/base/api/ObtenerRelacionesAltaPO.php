@@ -61,6 +61,24 @@ class ObtenerRelacionesAltaPO extends SugarApi
 
         $arrRelaciones=array();
         
+        //Habilita alta de PFAE si es Prospecto o Cliente
+        if($beanCuenta->tipodepersona_c == 'Persona Fisica con Actividad Empresarial' && ($beanCuenta->tipo_registro_cuenta_c == '2' || $beanCuenta->tipo_registro_cuenta_c  == '3') ){
+          $result = $this->verificaExistenciaEnPO($beanCuenta->email1);
+          $GLOBALS['log']->fatal( print_r($result,true) );
+          $count = count($result);
+          $tipoCuenta = ($beanCuenta->tipo_registro_cuenta_c == '2') ? 'Prospecto' : 'Cliente';
+          //Si no se encuentran registros, quiere decir que la cuenta aún no tiene un registro de PO
+          if( $count == 0 ){
+              $arrayRelacion = array();
+              $arrayRelacion['idRelacion'] = $beanCuenta->id;
+              $arrayRelacion['idCuenta'] = $beanCuenta->id;
+              $arrayRelacion['nombre'] = $beanCuenta->name;
+              $arrayRelacion['email'] = $beanCuenta->email1;
+              $arrayRelacion['relaciones'] = $tipoCuenta;
+              array_push( $arrRelaciones, $arrayRelacion);
+          }
+        }
+        
         if($beanCuenta->load_relationship('rel_relaciones_accounts_1')){
             $relatedRelaciones = $beanCuenta->rel_relaciones_accounts_1->getBeans();
             if( count($relatedRelaciones) >0 ){
@@ -72,8 +90,8 @@ class ObtenerRelacionesAltaPO extends SugarApi
                     $emailCuenta = $beanCuentaRelacion->email1;
                     $regimenFiscal = $beanCuentaRelacion->tipodepersona_c;
                     
-                    //Solo verificar personas fisicas
-                    if( $regimenFiscal == 'Persona Fisica' ){
+                    //Verificar PF & PFAE
+                    if( $regimenFiscal != 'Persona Moral' ){
 
                         $result = $this->verificaExistenciaEnPO($emailCuenta);
                         $GLOBALS['log']->fatal( print_r($result,true) );
@@ -177,8 +195,8 @@ class ObtenerRelacionesAltaPO extends SugarApi
                 if( isset($telefonos['trabajo']) )  $telTrabajo = $telefonos['trabajo'];
                 if( isset($telefonos['celular']) )  $telCelular = $telefonos['celular'];
             }
-
-            $dataProspect = $this->crearPO( $nombre, $paterno, $materno, $email, $telCasa, $telTrabajo, $telCelular, $rfc, $idAsesorCuentaPrincipal );
+            $regimen = ($beanCuenta->tipodepersona_c == 'Persona Fisica') ? '1' :'2'; 
+            $dataProspect = $this->crearPO( $nombre, $paterno, $materno, $email, $telCasa, $telTrabajo, $telCelular, $rfc, $idAsesorCuentaPrincipal, $regimen );
 
             return array(
                 "status" => "ok",
@@ -229,10 +247,10 @@ class ObtenerRelacionesAltaPO extends SugarApi
 
     }
 
-    public function crearPO( $nombre, $paterno, $materno, $email, $telCasa, $telTrabajo, $telCelular, $rfc, $idAsesor ){
+    public function crearPO( $nombre, $paterno, $materno, $email, $telCasa, $telTrabajo, $telCelular, $rfc, $idAsesor,$regimen  ){
         $GLOBALS['log']->fatal( "CREANDO PO" );
         $beanProspect = BeanFactory::newBean("Prospects");
-
+        $beanProspect->regimen_fiscal_c = $regimen;
         $beanProspect->nombre_c = $nombre;
         $beanProspect->apellido_paterno_c = $paterno;
         $beanProspect->apellido_materno_c = $materno;
@@ -553,5 +571,3 @@ class ObtenerRelacionesAltaPO extends SugarApi
     }
 
 }
-
-
