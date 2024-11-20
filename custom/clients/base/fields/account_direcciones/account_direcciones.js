@@ -1300,16 +1300,30 @@
                 if( keysTipoCuenta.includes(tipoRegistroCuenta) ||  existeRelacionParaPedirRequerida ){
 
                     var arrSinSepomex = [];
+                    var direccionHomologada = false; // Bandera para saber si hay una dirección homologada
+
                     //Recorremos las direcciones para saber si alguna direccion no está homologada con Sepomex
                     for (let index = 0; index < cont_dir.oDirecciones.direccion.length; index++) {
                         const element = cont_dir.oDirecciones.direccion[index];
                         var valCodigoPostal = element.valCodigoPostal;
-
+                        var valPrincipal = element.principal;
+                        var valSinSepomex = element.sinSepomex;
                         
-                        if( element.hasOwnProperty('sinSepomex') && _.isEmpty(valCodigoPostal) ){
+                        if(element.hasOwnProperty('sinSepomex') && valSinSepomex && _.isEmpty(valCodigoPostal) ){
                             arrSinSepomex.push(1);
+                            // Si la dirección no está homologada y tiene la bandera 'principal' activada, la desactivamos
+                            if (valPrincipal) {
+                                element.principal = 0;
+                            }
+
+                        } else {
+                            // Si encontramos una dirección homologada, activamos la bandera
+                            if (!direccionHomologada) {
+                                direccionHomologada = true;
+                                element.principal = 1;
+                            }
                         }
-                    }
+                    }                   
 
                     if( arrSinSepomex.includes(1) ){
 
