@@ -1340,6 +1340,7 @@
 
                     }
                 }
+                cont_dir.render();
                 callback(null, fields, errors);
             },
             error: function (error) {
