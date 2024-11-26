@@ -144,6 +144,7 @@ class ObtenerRelacionesAltaPO extends SugarApi
             $beanResumen = BeanFactory::getBean('tct02_Resumen', $idRegistro, array('disable_row_level_security' => true));
         
             $beanResumen->po_creado_c = 1;
+            $beanResumen->po_creado_estado_c = '';
 
             $beanResumen->save();
 
@@ -336,7 +337,7 @@ class ObtenerRelacionesAltaPO extends SugarApi
 
                 $this->sendEmailEnviaRespuestaDirector( $emailAsesor, "Autorización confirmada: Creación de nuevo PO – ".$nameRegistro, $bodyHtml );
 
-                $this->cleanFieldsResumen( $idRegistro );
+                $this->cleanFieldsResumen( $idRegistro, '2' );
 
                 $mensaje = "Se ha aprobado la creación del registro correctamente";
 
@@ -356,7 +357,7 @@ class ObtenerRelacionesAltaPO extends SugarApi
 
                 $this->sendEmailEnviaRespuestaDirector( $emailAsesor, "Solicitud rechazada: Creación de nuevo PO – ".$nameRegistro, $bodyHtml );
 
-                //$this->cleanFieldsResumen( $idRegistro );
+                $this->cleanFieldsResumen( $idRegistro, '3' );
 
                 $mensaje = "Se ha rechazado la creación del registro correctamente";
 
@@ -450,13 +451,14 @@ class ObtenerRelacionesAltaPO extends SugarApi
 
     }
 
-    public function cleanFieldsResumen( $idRegistro ){
+    public function cleanFieldsResumen( $idRegistro, $estado_po = null ){
 
         $beanResumen = BeanFactory::getBean('tct02_Resumen', $idRegistro, array('disable_row_level_security' => true));
         $GLOBALS['log']->fatal("Limpiamos bandera de PO creado y id de directorComercial");
         
         $beanResumen->id_dir_comercial_aprueba_c = '';
         $beanResumen->po_creado_c = 0;
+        $beanResumen->po_creado_estado_c = $estado_po;
 
         $beanResumen->save();
 
@@ -564,6 +566,7 @@ class ObtenerRelacionesAltaPO extends SugarApi
         $beanResumen = BeanFactory::getBean('tct02_Resumen', $idRegistro, array('disable_row_level_security' => true));
         
         $beanResumen->id_dir_comercial_aprueba_c = $idDirectorComercial;
+        $beanResumen->po_creado_estado_c = '1';
 
         $beanResumen->save();
 
