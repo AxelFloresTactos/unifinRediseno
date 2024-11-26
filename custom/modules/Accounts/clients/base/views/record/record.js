@@ -9170,6 +9170,15 @@ validaReqUniclickInfo: function () {
                         autoClose: false
                     });
                 }
+                //Si está notificado y entra alguien que no es director, muestra alaerta de pendiente de aprobación
+                if( data.po_creado_estado_c == '1' && data.id_dir_comercial_aprueba_c != currentUserId ){
+                    app.alert.show('pendienteAprobacion', {
+                        level: 'error',
+                        messages: 'Actualmente se tiene una solicitud de aprobación en proceso. Espere la confirmación o rechazo de su director',
+                        autoClose: false
+                    });
+                }
+                
                 //Si el usuario logueado es igual al Director comercial y además ya se creó el PO, se muestra pantalla con botones para aprobar y rechazar
                 else if( (data.po_creado_c == 1 && data.id_dir_comercial_aprueba_c == currentUserId ) || currentUserId == asesorLeasingId ){
                     app.drawer.open({

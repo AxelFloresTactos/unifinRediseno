@@ -970,11 +970,32 @@
     },
 
     reenvio_correo: function(){
+        /*
+          Valida datos requeridos:
+           - Teléfono celular a 10 digitos
+           - Correo electrónico
+        */
+        if( this.model.get('phone_mobile').trim() == '' || this.model.get('phone_mobile').trim().length != 10 ){
+          app.alert.show('telefono_invalido', {
+              level: 'error',
+              autoClose: false,
+              messages: 'Se requiere un teléfono celular válido de 10 dígitos para el PO'
+          });
+          return false;
+        }
+        if( this.model.get('email')[0] == undefined || this.model.get('email')[0].email_address == ''){
+          app.alert.show('correo_invalido', {
+              level: 'error',
+              autoClose: false,
+              messages: 'Se requiere un correo electrónico válido para el PO'
+          });
+          return false;
+        }
+        
         var id_prospecto = this.model.get('id');
-
         var buttonReenvio = this.getField('reenvio_correo');
         buttonReenvio.setDisabled(true);
-
+        
         app.alert.show('envio_correo', {
             level: 'process',
             title: 'Enviando correo',
