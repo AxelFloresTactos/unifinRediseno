@@ -83,7 +83,7 @@ class SendEmailPO extends SugarApi
             $body_mail = $this->buildBodyEmailVoBo( $name_comercial, $asesorName, $beanPO->name, $linkPO  );
             //Enviando correo
             //ToDO: Antes de enviar, validar que si se haya encontrado un director para enviar notificación y no se intenta mandar correo a una dirección vacía
-            if( $email_comercial != "" ){
+            if( $email_comercial != "" || $email_regional != ""){
                 $this->sendEmailNotificationPO( $nombre_empresa, $email_comercial, $name_comercial, $email_regional, $name_regional, $body_mail );
                 $response = "Se envió notificación a: ". $name_comercial. " y " .$name_regional; 
             }else{
@@ -1397,9 +1397,18 @@ class SendEmailPO extends SugarApi
             $mailer->setHtmlBody($body);
             $mailer->clearRecipients();
             
-            $mailer->addRecipientsTo(new EmailIdentity($email, $name_email));
-            if( $email_cc != "" ){
-                $mailer->addRecipientsCc(new EmailIdentity($email_cc, $name_email_cc));
+            //SI EXISTE EMAIL COMERCIAL 
+            if ($email != "") {
+                //DIRECCION PRINCIPAL A EMAIL COMERCIAL
+                $mailer->addRecipientsTo(new EmailIdentity($email, $name_email));
+                //CON COPIA A EMAIL REGIONAL
+                if($email_cc != "") {
+                    $mailer->addRecipientsCc(new EmailIdentity($email_cc, $name_email_cc));
+                }
+
+            } elseif ($email_cc != "") {
+                //DIRECCION PRINCIPAL A EMAIL REGIONAL
+                $mailer->addRecipientsTo(new EmailIdentity($email_cc, $name_email_cc));
             }
             
             $GLOBALS['log']->fatal("ENVIANDO CORREO A: ".$email." / ".$email_cc );
