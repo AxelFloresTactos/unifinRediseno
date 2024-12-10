@@ -4123,7 +4123,7 @@
 
     //Funcion que valida el contenido ingresado en el campo del Email
     expmail: function (fields, errors, callback) {
-        if (this.model.get('email') != null && this.model.get('email') != "") {
+        if (this.model.get('email') != null && this.model.get('email') != "" && this.model.get('email') != undefined) {
 
             var input = (this.model.get('email'));
             var expresion = /^\S+@\S+\.\S+[$%&|<>#]?$/;
