@@ -29,6 +29,7 @@
         this.model.addValidationTask('checkaccdatestatements', _.bind(this.checkaccdatestatements, this));
         this.model.addValidationTask('duplicate_check', _.bind(this.DuplicateCheck, this));
         this.model.addValidationTask('validaduplicadoRFC', _.bind(this.RFC_DuplicateCheck, this));
+        this.model.addValidationTask('validaduplicadoCURP', _.bind(this.CURP_DuplicateCheck, this));
         this.model.addValidationTask('check_email_telefono', _.bind(this._doValidateEmailTelefono, this));
         this.model.addValidationTask('check_telefonos', _.bind(this.validatelefonos, this));
         this.model.addValidationTask('check_rfc', _.bind(this._doValidateRFC, this));
@@ -9266,7 +9267,40 @@ validaReqUniclickInfo: function () {
             }
             
         });
-    }
+    },
 
+    CURP_DuplicateCheck: function (fields, errors, callback) {
+        var ACCURP = this.model.get('curp_c');
+        if (this.model.get('curp_c')) {
+            app.api.call("read", app.api.buildURL("Accounts/", null, null, {
+                fields: "curp_c",
+                max_num: 5,
+                "filter": [
+                    {
+                        "curp_c": ACCURP,
+                        "id": {
+                            $not_equals: this.model.id,
+                        }
+                    }
+                ]
+            }), null, {
+                success: _.bind(function (data) {
+                    if (data.records.length > 0) {
+                        app.alert.show("DuplicateCheck", {
+                            level: "error",
+                            title: "Ya existe una persona registrada con el mismo CURP.",
+                            autoClose: false
+                        });
+
+                        errors['curp_c'] = errors['curp_c'] || {};
+                        errors['curp_c'].required = true;
+                    }
+                    callback(null, fields, errors);
+                }, this)
+            });
+        } else {
+            callback(null, fields, errors);
+        }
+    },
 
 })
