@@ -463,6 +463,7 @@
         this.model.addValidationTask('check_telefonos', _.bind(this.validatelefonosexisting, this));
         this.model.addValidationTask('check_direcciones', _.bind(this.validadireccexisting, this));
         this.model.addValidationTask('check_rfc', _.bind(this._doValidateRFC, this));
+        this.model.addValidationTask('check_curp', _.bind(this._doValidateCURP, this));
         this.model.on('change:pais_nacimiento_c', this.validaExtranjerosRFC, this);
         //this.model.on('change:rfc_c',this.validaFechaNacimientoDesdeRFC, this);
         this.model.on('change:account_telefonos', this.setPhoneOffice, this);
@@ -2002,12 +2003,18 @@
                 rfc=this.model.get('rfc_c');
             }
 
+            var curp="";
+            if(this.model.get('curp_c') != undefined && this.model.get('curp_c') != ""){
+                curp=this.model.get('curp_c');
+            }
+
             //Parámetros para consumir servicio
             var params = {
                 'nombre': this.model.get('name'),
                 'correo': email,
                 'telefonos': telefonos,
                 'rfc': rfc,
+                'curp': curp
             };
 
             /*
@@ -3650,5 +3657,42 @@
           callback(null, fields, errors);
         }
 
+    },
+
+    _doValidateCURP: function (fields, errors, callback) {
+        if (this.model.get('curp_c')) {
+            var fields = ["primernombre_c", "segundonombre_c", "apellidopaterno_c", "apellidomaterno_c", 'curp_c'];
+            var ACCURP = this.model.get('curp_c');
+            app.api.call("read", app.api.buildURL("Accounts/", null, null, {
+                fields: fields.join(','),
+                max_num: 5,
+                "filter": [
+                    {
+                        "curp_c": ACCURP,
+                        "id": {
+                            $not_equals: this.model.id,
+                        }
+                    }
+                ]
+            }), null, {
+                success: _.bind(function (data) {
+                    if (data.records.length > 0) {
+
+                        app.alert.show("DuplicateCheck", {
+                            level: "error",
+                            title: "El CURP ingresado ya Existe.",
+                            autoClose: false
+                        });
+
+                        this.model.set("curp_c", '');
+
+                        errors['curp_c'] = errors['curp_c'] || {};
+                        errors['curp_c'].required = true;
+
+                    }
+                }, this)
+            });
+        }
+        callback(null, fields, errors);
     },
 })
