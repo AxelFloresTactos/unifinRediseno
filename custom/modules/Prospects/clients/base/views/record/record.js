@@ -511,6 +511,16 @@
 
         //Se omite función para deshabilitar origen, ya que se opta por hacerlo a través de dependencias
         this.deshabilitaOrigen();
+        self.noEditFields.push('origen_c');
+        $('[data-name="origen_c"]').css('pointer-events','none');
+        self.$('.record-edit-link-wrapper[data-name=origen_c]').remove();
+        self.noEditFields.push('detalle_origen_c');
+        $('[data-name="detalle_origen_c"]').css('pointer-events','none');
+        self.$('.record-edit-link-wrapper[data-name=detalle_origen_c]').remove();
+
+
+
+
     },
 
     deshabilitaOrigen:function(){
@@ -577,17 +587,8 @@
 
     //Función para eliminar opciones del campo origen
     estableceOpcionesOrigenLeads:function(){
-        var opciones_origen = app.lang.getAppListStrings('origen_lead_list');
-
-        if (App.user.attributes.puestousuario_c != '53') { //Si no tiene puesto uniclick, se eliminan las opciones Closer y Growth
-            Object.keys(opciones_origen).forEach(function (key) {
-                if (key == "14" || key == "15") {
-                    delete opciones_origen[key];
-                }
-            });
-        }
-
-        this.model.fields['origen_c'].options = opciones_origen;
+        this.model.set('origen_c','20');
+        this.model.set('detalle_origen_c','113');
     },
 
     editClicked: function () {

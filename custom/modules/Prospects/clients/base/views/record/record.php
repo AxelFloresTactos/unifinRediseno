@@ -277,13 +277,13 @@ $viewdefs['Prospects']['base']['view']['record'] = array (
         ),
         14 => 
         array (
-          'readonly' => true,
+          'readonly' => false,
           'name' => 'origen_c',
           'label' => 'LBL_ORIGEN_C',
         ),
         15 => 
         array (
-          'readonly' => true,
+          'readonly' => false,
           'name' => 'detalle_origen_c',
           'label' => 'LBL_DETALLE_ORIGEN_C',
         ),
