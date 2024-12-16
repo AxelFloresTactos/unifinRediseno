@@ -119,5 +119,18 @@ class Prospects_AsignacionPO
             }
           }   
         }
+        //SE APLICA ACTUALIZACIÓN
+        if ($args['isUpdate'] && $_SESSION['platform'] != 'base') {       
+          //VALIDA SOLO SI HA CAMBIADO DE VALOR LA ZONA GEOGRAFICA
+          if(!empty($bean->zona_geografica_c) && $bean->fetched_row['zona_geografica_c'] != $bean->zona_geografica_c){
+
+            $valor_zona_geografica = $app_list_strings['mapeo_dire_estado_zona_geografica_list'][$bean->zona_geografica_c];
+            $GLOBALS['log']->fatal("ACTUAIZACION DE ZONA GEOGRAFICA ENCONTRADA: ". $valor_zona_geografica);
+
+            if(!empty($valor_zona_geografica)){
+              $bean->zona_geografica_c = $valor_zona_geografica;
+            }
+          }        
+        }
     }
 }
