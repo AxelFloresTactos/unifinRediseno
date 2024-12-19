@@ -86,3 +86,5 @@ $mod_strings['LBL_MUNICIPIO_PO'] = 'Municipio';
 $mod_strings['LBL_CP_PO'] = 'Código Postal';
 $mod_strings['LBL_ASESOR_ALIANZA'] = 'Asesor Alianza';
 $mod_strings['LBL_COUNT_MATCH'] = 'Match PO';
+$mod_strings['LBL_APRUEBA_CAMBIO_ORIGEN'] = 'Aprueba cambio origen';
+$mod_strings['LBL_ORIGEN_BLOQUEADO'] = 'Origen bloqueado';

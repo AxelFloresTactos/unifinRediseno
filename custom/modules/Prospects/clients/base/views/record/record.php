@@ -137,6 +137,14 @@ $viewdefs['Prospects']['base']['view']['record'] = array (
           'label' => 'Reenvío Correo',
           'acl_action' => 'view',
         ),
+        12 => 
+        array (
+          'type' => 'rowaction',
+          'event' => 'button:cambiar_origen:click',
+          'name' => 'cambiar_origen',
+          'label' => 'Solicitar Cambio Origen',
+          'acl_action' => 'view',
+        ),
       ),
     ),
     5 => 
@@ -773,6 +781,18 @@ $viewdefs['Prospects']['base']['view']['record'] = array (
           'readonly' => false,
           'name' => 'id_director_vobo_c',
           'label' => 'LBL_ID_DIRECTOR_VOBO',
+        ),
+        34 => 
+        array (
+          'readonly' => false,
+          'name' => 'origen_bloqueado_c',
+          'label' => 'LBL_ORIGEN_BLOQUEADO_C',
+        ),
+        35 => 
+        array (
+          'readonly' => false,
+          'name' => 'aprueba_cambio_origen_c',
+          'label' => 'LBL_APRUEBA_CAMBIO_ORIGEN_C',
         ),
       ),
     ),
