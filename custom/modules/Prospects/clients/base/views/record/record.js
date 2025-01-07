@@ -14,6 +14,9 @@
         //Botones para Aprobar/Rechazar envío de correos
         this.context.on('button:vobo_envio_correo:click', this.vobo_envio_correo, this);
         this.context.on('button:rechaza_envio_correo:click', this.rechaza_envio_correo, this);
+        
+        //Solicitar edición de origen
+        this.context.on('button:cambiar_origen:click', this.solicta_cambio_origen, this);
 
         //this.model.on('sync', this._hideBtnConvert, this);
         this._readonlyFields();
@@ -95,7 +98,7 @@
             this.toggleViewButtons(true);
             this.adjustHeaderpaneFields();
         }
-        this.deshabilitaOrigen();
+        //this.deshabilitaOrigen();
     },
 
     /*
@@ -114,7 +117,7 @@
                 $firstInput.focus();
                 self.setCaretToEnd($firstInput);
             }
-            self.deshabilitaOrigen();
+            //self.deshabilitaOrigen();
         });
     },
 
@@ -510,7 +513,36 @@
         }
 
         //Se omite función para deshabilitar origen, ya que se opta por hacerlo a través de dependencias
-        this.deshabilitaOrigen();
+        if(!App.user.attributes.define_origen_po_c){
+            //this.deshabilitaOrigen();
+            self.noEditFields.push('origen_c');
+            $('[data-name="origen_c"]').css('pointer-events','none');
+            self.$('.record-edit-link-wrapper[data-name=origen_c]').remove();
+            self.noEditFields.push('detalle_origen_c');
+            $('[data-name="detalle_origen_c"]').css('pointer-events','none');
+            self.$('.record-edit-link-wrapper[data-name=detalle_origen_c]').remove();
+        }else{
+          if(this.model.get('origen_bloqueado_c')){
+              self.noEditFields.push('origen_c');
+              $('[data-name="origen_c"]').css('pointer-events','none');
+              self.$('.record-edit-link-wrapper[data-name=origen_c]').remove();
+              self.noEditFields.push('detalle_origen_c');
+              $('[data-name="detalle_origen_c"]').css('pointer-events','none');
+              self.$('.record-edit-link-wrapper[data-name=detalle_origen_c]').remove();
+            
+          }else{
+              var opciones_origen = app.lang.getAppListStrings('origen_lead_list');
+              //Define opciones de origen
+              var current_option = this.model.get('origen_c');
+              Object.keys(opciones_origen).forEach(function (key) {
+                  if (key != "12" && key != "20" && key != current_option) { //12:Alianzas - 20:Leasing
+                      delete opciones_origen[key];
+                  }
+              });
+              this.model.fields['origen_c'].options = opciones_origen;
+          }
+        }
+        
     },
 
     deshabilitaOrigen:function(){
@@ -577,17 +609,8 @@
 
     //Función para eliminar opciones del campo origen
     estableceOpcionesOrigenLeads:function(){
-        var opciones_origen = app.lang.getAppListStrings('origen_lead_list');
-
-        if (App.user.attributes.puestousuario_c != '53') { //Si no tiene puesto uniclick, se eliminan las opciones Closer y Growth
-            Object.keys(opciones_origen).forEach(function (key) {
-                if (key == "14" || key == "15") {
-                    delete opciones_origen[key];
-                }
-            });
-        }
-
-        this.model.fields['origen_c'].options = opciones_origen;
+        this.model.set('origen_c','20');
+        this.model.set('detalle_origen_c','113');
     },
 
     editClicked: function () {
@@ -1012,6 +1035,65 @@
                     messages: response,
                 });
 
+            }, this),
+        });
+    },
+    
+    
+    solicta_cambio_origen: function(){
+        /*
+          Valida que tenga origen bloqueado
+        */
+        if(!App.user.attributes.define_origen_po_c){
+          app.alert.show('not_access', {
+              level: 'error',
+              autoClose: false,
+              messages: 'No cuentas con permiso para solicitar cambiar el origen de un PO'
+          });
+          return false;
+        }
+        
+        if( !this.model.get('origen_bloqueado_c') && this.model.get('origen_c')=='' ){
+          app.alert.show('sin_bloqueo', {
+              level: 'error',
+              autoClose: false,
+              messages: 'Este PO no tiene bloqueada la edición de origen'
+          });
+          return false;
+        }
+        if( this.model.get('origen_bloqueado_c') && this.model.get('aprueba_cambio_origen_c') == 'SOLICITAR'){
+          app.alert.show('en_proceso', {
+              level: 'error',
+              autoClose: false,
+              messages: 'Ya se ha generado una solicitud de edición'
+          });
+          return false;
+        }
+        
+        var id_prospecto = this.model.get('id');
+        var botonOrigen = this.getField('cambiar_origen');
+        botonOrigen.setDisabled(true);
+        //Actualiza bean y guarda
+        this.model.set('origen_bloqueado_c',true);
+        this.model.set('aprueba_cambio_origen_c','Solicitar');
+        this.model.save();
+        
+        app.alert.show('proceso_solicitud', {
+            level: 'process',
+            title: 'Enviando correo',
+        });
+        
+        var args = {
+            "id_po": this.model.get('id')
+        };
+        app.api.call("create", app.api.buildURL("solicitaEdicionOrigenPO", null, null, args), null, {
+            success: _.bind(function (response) {
+                app.alert.dismiss('proceso_solicitud');
+                botonOrigen.setDisabled(true);
+                app.alert.show('alert_reenvio_correo', {
+                    level: 'success',
+                    messages: response['description'],
+                });
             }, this),
         });
     },

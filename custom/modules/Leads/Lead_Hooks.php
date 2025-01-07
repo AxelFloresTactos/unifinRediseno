@@ -319,6 +319,8 @@ SQL;
             if($prospect->assigned_user_id) {
                $bean->assigned_user_id = $prospect->assigned_user_id;
             }
+            //$bean->origen_c = $prospect->origen_c;
+            //$bean->detalle_origen_c = $prospect->detalle_origen_c;
         }
         /* Valida relación de con Cuenta para establecer Asignado
          */

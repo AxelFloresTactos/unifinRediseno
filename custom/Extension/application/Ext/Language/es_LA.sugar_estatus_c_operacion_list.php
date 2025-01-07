@@ -1,5 +1,5 @@
 <?php
- // created: 2024-10-22 15:10:16
+ // created: 2024-12-06 10:45:57
 
 $app_list_strings['estatus_c_operacion_list']=array (
   'P' => 'INTEGRACIÓN DE EXPEDIENTE',
@@ -38,4 +38,5 @@ $app_list_strings['estatus_c_operacion_list']=array (
   'CV' => 'CANCELADA POR VIGENCIA',
   'BE' => 'BLOQUEADA POR EXPEDIENTE',
   'VF' => 'VALIDACIÓN DE FIRMAS DE FORMATOS UNIFIN',
+  'RV' => 'RECHAZADA POR VISITA OCULAR',
 );

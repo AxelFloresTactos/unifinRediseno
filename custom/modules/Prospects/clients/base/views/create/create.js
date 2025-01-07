@@ -48,6 +48,7 @@
 
         //Función para eliminar opciones del campo origen
         this.estableceOpcionesOrigenLeads();
+        this.model.on("change:origen_c", _.bind(this.estableceOpcionesOrigenLeads, this));
     },
 
     delegateButtonEvents: function() {
@@ -588,16 +589,48 @@
     //Función para eliminar opciones del campo origen
     estableceOpcionesOrigenLeads:function(){
         var opciones_origen = app.lang.getAppListStrings('origen_lead_list');
+        var opciones_detalle_origen = app.lang.getAppListStrings('detalle_origen_list');
 
-        if (App.user.attributes.puestousuario_c != '53') { //Si no tiene puesto uniclick, se eliminan las opciones Closer y Growth
+        if (App.user.attributes.define_origen_po_c) { //Se modifica validación para habilitar origen si usuario tiene define_origen_po_c
+            //Define opciones de origen
             Object.keys(opciones_origen).forEach(function (key) {
-                if (key == "14" || key == "15") {
+                if (key != "12" && key != "20") { //12:Alianzas - 20:Leasing
                     delete opciones_origen[key];
                 }
             });
+            this.model.fields['origen_c'].options = opciones_origen;
+            if(this.model.get('origen_c') == undefined || this.model.get('origen_c') == "" ){
+                this.model.set('origen_c','12');
+            }
+            
+            //Define opciones de detalle origen
+            Object.keys(opciones_detalle_origen).forEach(function (key) {
+                if (key != "12" && key != "13" && key != "113") { //12:SOC, 13:Creditaria - 113:Leasing
+                    delete opciones_detalle_origen[key];
+                }
+            });
+            if(this.model.get('detalle_origen_c') == undefined || this.model.get('detalle_origen_c') == "" ){
+                this.model.set('detalle_origen_c','12');
+            }
+            this.model.fields['detalle_origen_c'].options = opciones_detalle_origen;
+            
+        }else{
+          //Define opciones de origen
+          Object.keys(opciones_origen).forEach(function (key) {
+              if (key != "20") { // 20:Leasing
+                  delete opciones_origen[key];
+              }
+          });
+          this.model.fields['origen_c'].options = opciones_origen;
+          this.model.set('origen_c','20');
+          this.model.set('detalle_origen_c','113');
+          self.noEditFields.push('origen_c');
+          $('[data-name="origen_c"]').css('pointer-events','none');
+          self.$('.record-edit-link-wrapper[data-name=origen_c]').remove();
+          self.noEditFields.push('detalle_origen_c');
+          $('[data-name="detalle_origen_c"]').css('pointer-events','none');
+          self.$('.record-edit-link-wrapper[data-name=detalle_origen_c]').remove();
         }
-
-        this.model.fields['origen_c'].options = opciones_origen;
 
     },
 
@@ -797,6 +830,12 @@
 
         //Deshabilita Estado
         $('[data-name="estatus_po_c"]').attr('style', 'pointer-events:none');
+        
+        //Deshabilita Origen
+        if(!App.user.attributes.define_origen_po_c){
+          $('[data-name="origen_c"]').attr('style', 'pointer-events:none');
+          $('[data-name="detalle_origen_c"]').attr('style', 'pointer-events:none');
+        }
 
     },
 

@@ -33,6 +33,23 @@ class SendEmailPO extends SugarApi
                 'method' => 'rechazaEnvioCorreo',
                 'shortHelp' => 'Envía correo a través del rechazo del director del PO',
             ),
+            'solicitaEdicionOrigenPO' => array(
+                'reqType' => 'POST',
+                'noLoginRequired' => true,
+                'path' => array('solicitaEdicionOrigenPO'),
+                'pathVars' => array(''),
+                'method' => 'solicitaCambioOrigen',
+                'shortHelp' => 'Envía notificación por email a respectivos usuarios para solicitar aprobación en edición de Origen de Público Objetivo',
+            ),
+            'notificaAccionEdicionOrigenPO' => array(
+                'reqType' => 'POST',
+                'noLoginRequired' => true,
+                'path' => array('notificaEdicionOrigenPO'),
+                'pathVars' => array(''),
+                'method' => 'notificaCambioOrigen',
+                'shortHelp' => 'Envía notificación por email a respectivos usuarios para solicitar aprobación en edición de Origen de Público Objetivo',
+            ),
+            
         );
     }
 
@@ -1534,6 +1551,557 @@ class SendEmailPO extends SugarApi
         }
 
     }
+    
+    
+    public function solicitaCambioOrigen($api, $args)
+    {
+        global $current_user, $sugar_config, $app_list_strings;
+        $id_prospecto = $args['id_po'];
+        $id_asesor = $current_user->id;
+        $response = [];
+        $response['status']='';
+        $response['description']='';
+        $beanPO = BeanFactory::retrieveBean('Prospects', $id_prospecto, array('disable_row_level_security' => true));
+        $linkAutoriza=$GLOBALS['sugar_config']['site_url'].'/?entryPoint=cambioOrigenPO&accion=aceptar&id='.$id_prospecto;
+        $linkRechazo=$GLOBALS['sugar_config']['site_url'].'/?entryPoint=cambioOrigenPO&accion=rechazar&id='.$id_prospecto;
+        $nombreEmpresa = $beanPO->empresa_po_c;
+        $nombrePO = $beanPO->last_name;
+        $beanAsesor = BeanFactory::retrieveBean('Users', $id_asesor, array('disable_row_level_security' => true));
+        $nombreAsesor = $beanAsesor->first_name . " " . $beanAsesor->last_name;
+        
+        $lista_emails = $app_list_strings['notifica_cambio_origen_po_list'];
+        $arr_emails = array();
+        foreach ($lista_emails as $key => $email) {
+            array_push($arr_emails,$email);
+        }
+
+        try{
+            //Define correo
+            $body_correo = $this->buildBodySolictaEdicion( $nombrePO,$nombreAsesor, $linkAutoriza, $linkRechazo);
+            
+            $mailer = MailerFactory::getSystemDefaultMailer();
+            $mailTransmissionProtocol = $mailer->getMailTransmissionProtocol();
+            $mailer->setSubject('UNIFIN CRM: Solicitud para cambio de origen en PO');
+            $mailer->addAttachment(new \EmbeddedImage('Copia_de_Recurso-2unileasingazulLOW', 'custom/images_email/Copia_de_Recurso-2unileasingazulLOW.png', 'Copia_de_Recurso-2unileasingazulLOW'), "Copia_de_Recurso-2unileasingazulLOW");
+            $body = trim($body_correo);
+            $mailer->setHtmlBody($body);
+            $mailer->clearRecipients();
+            
+            //Agrega destinatarios
+            $lista_emails = $app_list_strings['notifica_cambio_origen_po_list'];
+            $arr_emails = array();
+            foreach ($lista_emails as $key => $email) {
+                array_push($arr_emails,$email);
+            }
+            if( count($arr_emails) > 0 ){
+                for ($i = 0; $i < count($arr_emails); $i++) {
+                    $GLOBALS['log']->fatal("AGREGANDO CORREOS Edición Origen PO: " . $arr_emails[$i]);
+                    $mailer->addRecipientsCc(new EmailIdentity($arr_emails[$i], $arr_emails[$i]));
+                }
+            }
+            $result = $mailer->send();
+            $response['status']='200';
+            $response['description']='Se generó solicitud para cambio de origen';
+            
+
+        } catch (Exception $e){
+            $GLOBALS['log']->fatal("Exception: No se ha podido enviar el correo electrónico");
+            $GLOBALS['log']->fatal(print_r($e,true));
+            $response['status']='500';
+            $response['description']=$e;
+
+        }
+        
+        return $response;
+
+    }
+    
+    public function notificaCambioOrigen($api, $args)
+    {
+        global $current_user, $sugar_config, $app_list_strings;
+        $id_prospecto = isset($args['id_po']) ? $args['id_po'] : '';
+        $id_responsable = isset($args['id_usuario']) ? $args['id_usuario'] : '';
+        $accion = isset($args['accion']) ? $args['accion'] : '--';
+        $response = [];
+        $response['status']='';
+        $response['description']='';
+        //Recupera PO
+        $beanPO = BeanFactory::retrieveBean('Prospects', $id_prospecto, array('disable_row_level_security' => true));
+        $nombrePO = $beanPO->last_name;
+        $link_po=$GLOBALS['sugar_config']['site_url'].'/#Prospects/'.$id_prospecto;
+        //Recupera Asesor asignado
+        $id_asesor = $beanPO->assigned_user_id;
+        $beanAsesor = BeanFactory::retrieveBean('Users', $id_asesor, array('disable_row_level_security' => true));
+        $correoAsesor = $beanAsesor->email1;
+        
+        //Recupera Asesor responable
+        $beanAsesorR = BeanFactory::retrieveBean('Users', $id_asesor, array('disable_row_level_security' => true));
+        $nombreAsesorR = $beanAsesorR->first_name . " " . $beanAsesorR->last_name;
+  
+        try{
+            //Define correo
+            $body_correo = $this->buildBodyRespuestaEdicion( $nombrePO,$nombreAsesorR, $accion, $link_po);
+            $mailer = MailerFactory::getSystemDefaultMailer();
+            $mailTransmissionProtocol = $mailer->getMailTransmissionProtocol();
+            $mailer->setSubject('UNIFIN CRM: Solicitud de cambio de origen '.$accion);
+            $mailer->addAttachment(new \EmbeddedImage('Copia_de_Recurso-2unileasingazulLOW', 'custom/images_email/Copia_de_Recurso-2unileasingazulLOW.png', 'Copia_de_Recurso-2unileasingazulLOW'), "Copia_de_Recurso-2unileasingazulLOW");
+            $body = trim($body_correo);
+            $mailer->setHtmlBody($body);
+            $mailer->clearRecipients();
+            //Agrega destinatarios
+            $mailer->addRecipientsTo(new EmailIdentity($correoAsesor, $correoAsesor));
+
+            $result = $mailer->send();
+            $response['status']='200';
+            $response['description']='Se generó envío de correo';
+
+        } catch (Exception $e){
+            $GLOBALS['log']->fatal("Exception: No se ha podido enviar el correo electrónico");
+            $GLOBALS['log']->fatal(print_r($e,true));
+            $response['status']='500';
+            $response['description']=$e;
+
+        }
+        
+        return $response;
+
+    }
+    
+    
+
+    public function buildBodySolictaEdicion( $nombre_po, $nombre_asesor, $linkAutoriza, $linkRechazo){
+
+          $mailHTML = '<head>
+          <title></title>
+          <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+          <meta content="width=device-width, initial-scale=1.0" name="viewport"/><!--[if mso]><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch><o:AllowPNG/></o:OfficeDocumentSettings></xml><![endif]-->
+          <style>
+              * {
+                  box-sizing: border-box;
+              }
+
+              body {
+                  margin: 0;
+                  padding: 0;
+              }
+
+              a[x-apple-data-detectors] {
+                  color: inherit !important;
+                  text-decoration: inherit !important;
+              }
+
+              #MessageViewBody a {
+                  color: inherit;
+                  text-decoration: none;
+              }
+
+              p {
+                  line-height: inherit
+              }
+
+              .desktop_hide,
+              .desktop_hide table {
+                  mso-hide: all;
+                  display: none;
+                  max-height: 0px;
+                  overflow: hidden;
+              }
+
+              .image_block img+div {
+                  display: none;
+              }
+
+              @media (max-width:620px) {
+                  .mobile_hide {
+                      display: none;
+                  }
+
+                  .row-content {
+                      width: 100% !important;
+                  }
+
+                  .stack .column {
+                      width: 100%;
+                      display: block;
+                  }
+
+                  .mobile_hide {
+                      min-height: 0;
+                      max-height: 0;
+                      max-width: 0;
+                      overflow: hidden;
+                      font-size: 0px;
+                  }
+
+                  .desktop_hide,
+                  .desktop_hide table {
+                      display: table !important;
+                      max-height: none !important;
+                  }
+
+                  .row-1 .column-1 .block-1.paragraph_block td.pad>div,
+                  .row-3 .column-1 .block-1.paragraph_block td.pad>div,
+                  .row-5 .column-1 .block-1.paragraph_block td.pad>div {
+                      text-align: center !important;
+                      font-size: 14px !important;
+                  }
+
+                  .row-1 .column-1 .block-1.paragraph_block td.pad,
+                  .row-3 .column-1 .block-1.paragraph_block td.pad,
+                  .row-5 .column-1 .block-1.paragraph_block td.pad {
+                      padding: 20px 35px !important;
+                  }
+
+                  .row-1 .column-1,
+                  .row-3 .column-1,
+                  .row-4 .column-1,
+                  .row-5 .column-1 {
+                      padding: 0 !important;
+                  }
+              }
+          </style>
+          </head>
+          <body style="background-color: #e4e7e7; margin: 0; padding: 0; -webkit-text-size-adjust: none; text-size-adjust: none;">
+          <table border="0" cellpadding="0" cellspacing="0" class="nl-container" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #e4e7e7;" width="100%">
+              <tbody>
+                  <tr>
+                      <td>
+                          <table align="center" border="0" cellpadding="0" cellspacing="0" class="row row-1" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #cdd2d9;" width="100%">
+                              <tbody>
+                                  <tr>
+                                      <td>
+                                          <table align="center" border="0" cellpadding="0" cellspacing="0" class="row-content stack" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #56adff; color: #000; width: 600px; margin: 0 auto;" width="600">
+                                              <tbody>
+                                                  <tr>
+                                                      <td class="column column-1" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; font-weight: 400; text-align: left; vertical-align: top; border-top: 0px; border-right: 0px; border-bottom: 0px; border-left: 0px;" width="100%">
+                                                          <table border="0" cellpadding="0" cellspacing="0" class="paragraph_block block-1" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;" width="100%">
+                                                              <tr>
+                                                                  <td class="pad">
+                                                                      <div style="color:#041e41;direction:ltr;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;font-size:6px;font-weight:400;letter-spacing:0px;line-height:150%;text-align:justify;mso-line-height-alt:9px;"> </div>
+                                                                  </td>
+                                                              </tr>
+                                                          </table>
+                                                      </td>
+                                                  </tr>
+                                              </tbody>
+                                          </table>
+                                      </td>
+                                  </tr>
+                              </tbody>
+                          </table>
+                          <table align="center" border="0" cellpadding="0" cellspacing="0" class="row row-3" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #cdd2d9;" width="100%">
+                              <tbody>
+                                  <tr>
+                                      <td>
+                                          <table align="center" border="0" cellpadding="0" cellspacing="0" class="row-content stack" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #fff; color: #000; width: 600px; margin: 0 auto;" width="600">
+                                              <tbody>
+                                                  <tr>
+                                                      <td class="column column-1" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; font-weight: 400; text-align: left; vertical-align: top; border-top: 0px; border-right: 0px; border-bottom: 0px; border-left: 0px;" width="100%">
+                                                          <table border="0" cellpadding="0" cellspacing="0" class="paragraph_block block-1" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;" width="100%">
+                                                              <tr>
+                                                                  <td class="pad" style="padding-bottom:25px;padding-left:50px;padding-right:50px;padding-top:25px;">
+                                                                      <div style="color:#041e41;direction:ltr;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;font-size:16px;font-weight:400;letter-spacing:0px;line-height:150%;text-align:justify;mso-line-height-alt:24px;">
+                                                                          <p style="margin: 0; margin-bottom: 16px;">Hola!</p>
+                                                                          <p style="margin: 0; margin-bottom: 16px;">Te informamos que  <strong>'.$nombre_asesor.'</strong> está solicitando aprobación para la edición de Origen del prospecto: <strong>'.$nombre_po.'</strong> .</p>
+                                                                          <p style="margin: 0; margin-bottom: 16px;">Indica tu decisión a continuación:</p>
+                                                                          <table border="0" cellpadding="10" cellspacing="0" class="button_block block-3" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+                                                                              <tr>
+                                                                                  <td class="">
+                                                                                      <div align="center" class="alignment"><!--[if mso]><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" style="height:43px;width:136px;v-text-anchor:middle;" arcsize="63%" stroke="false" fillcolor="#05aa6d"><w:anchorlock/><v:textbox inset="0px,0px,0px,0px"><center style="color:#ffffff; font-family:Arial, sans-serif; font-size:16px"><![endif]-->
+                                                                                          <div style="text-decoration:none;display:inline-block;color:#ffffff;background-color:#05aa6d;border-radius:27px;width:auto;border-top:0px solid transparent;font-weight:400;border-right:0px solid transparent;border-bottom:0px solid transparent;border-left:0px solid transparent;padding-top:5px;padding-bottom:5px;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;font-size:16px;text-align:center;mso-border-alt:none;word-break:keep-all;"><span style="padding-left:20px;padding-right:20px;font-size:16px;display:inline-block;letter-spacing:normal;">
+                                                                                          <span style="word-break: break-word; line-height: 32px;">
+                                                                                              <a id="linkPO" href="' . $linkAutoriza . '"><strong>Aceptar<br></strong></a>
+                                                                                          </span>
+                                                                                          </span></div><!--[if mso]></center></v:textbox></v:roundrect><![endif]-->
+                                                                                      </div>
+                                                                                      </td>
+                                                                                      <td class="pad">
+                                                                                      <div align="center" class="alignment"><!--[if mso]><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" style="height:43px;width:136px;v-text-anchor:middle;" arcsize="63%" stroke="false" fillcolor="#e46962"><w:anchorlock/><v:textbox inset="0px,0px,0px,0px"><center style="color:#ffffff; font-family:Arial, sans-serif; font-size:16px"><![endif]-->
+                                                                                          <div style="text-decoration:none;display:inline-block;color:#ffffff;background-color:#e46962;border-radius:27px;width:auto;border-top:0px solid transparent;font-weight:400;border-right:0px solid transparent;border-bottom:0px solid transparent;border-left:0px solid transparent;padding-top:5px;padding-bottom:5px;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;font-size:16px;text-align:center;mso-border-alt:none;word-break:keep-all;"><span style="padding-left:20px;padding-right:20px;font-size:16px;display:inline-block;letter-spacing:normal;">
+                                                                                          <span style="word-break: break-word; line-height: 32px;">
+                                                                                              <a id="linkPO" href="' . $linkRechazo . '"><strong>Rechazar<br></strong></a>
+                                                                                          </span>
+                                                                                          </span></div><!--[if mso]></center></v:textbox></v:roundrect><![endif]-->
+                                                                                      </div>
+                                                                                  </td>
+                                                                              </tr>
+                                                                              </table>
+                                                                          <br/>
+                                                                          <p style="margin: 0;">Atentamente, UNIFIN.</p>
+                                                                      </div>
+                                                                  </td>
+                                                              </tr>
+                                                          </table>
+                                                      </td>
+                                                  </tr>
+                                              </tbody>
+                                          </table>
+                                      </td>
+                                  </tr>
+                              </tbody>
+                          </table>
+                          <table align="center" border="0" cellpadding="0" cellspacing="0" class="row row-4" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #cdd2d9;" width="100%">
+                              <tbody>
+                                  <tr>
+                                      <td>
+                                          <table align="center" border="0" cellpadding="0" cellspacing="0" class="row-content stack" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #fff; color: #000; width: 600px; margin: 0 auto;" width="600">
+                                              <tbody>
+                                                  <tr>
+                                                      <td class="column column-1" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; font-weight: 400; text-align: left; padding-bottom: 15px; padding-left: 15px; padding-right: 15px; padding-top: 15px; vertical-align: top; border-top: 0px; border-right: 0px; border-bottom: 0px; border-left: 0px;" width="100%">
+                                                          <table border="0" cellpadding="0" cellspacing="0" class="image_block block-1" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+                                                              <tr>
+                                                                  <td class="pad" style="padding-bottom:20px;width:100%;">
+                                                                      <div align="center" class="alignment" style="line-height:10px"><img src="cid:Copia_de_Recurso-2unileasingazulLOW" style="display: block; height: auto; border: 0; max-width: 102px; width: 100%;" width="102"/></div>
+                                                                  </td>
+                                                              </tr>
+                                                          </table>
+                                                      </td>
+                                                  </tr>
+                                              </tbody>
+                                          </table>
+                                      </td>
+                                  </tr>
+                              </tbody>
+                          </table>
+                          <table align="center" border="0" cellpadding="0" cellspacing="0" class="row row-5" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #cdd2d9;" width="100%">
+                              <tbody>
+                                  <tr>
+                                      <td>
+                                          <table align="center" border="0" cellpadding="0" cellspacing="0" class="row-content stack" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #dde1e9; color: #000; width: 600px; margin: 0 auto;" width="600">
+                                              <tbody>
+                                                  <tr>
+                                                      <td class="column column-1" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; font-weight: 400; text-align: left; vertical-align: top; border-top: 0px; border-right: 0px; border-bottom: 0px; border-left: 0px;" width="100%">
+                                                          <table border="0" cellpadding="0" cellspacing="0" class="paragraph_block block-1" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;" width="100%">
+                                                              <tr>
+                                                                  <td class="pad" style="padding-bottom:25px;padding-left:30px;padding-right:30px;padding-top:25px;">
+                                                                      <div style="color:#000000;direction:ltr;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;font-size:12px;font-weight:400;letter-spacing:0px;line-height:120%;text-align:center;mso-line-height-alt:14.399999999999999px;">
+                                                                          <p style="margin: 0;"><em>Información confidencial y exclusiva para uso interno de Unifin.</em></p>
+                                                                      </div>
+                                                                  </td>
+                                                              </tr>
+                                                          </table>
+                                                      </td>
+                                                  </tr>
+                                              </tbody>
+                                          </table>
+                                      </td>
+                                  </tr>
+                              </tbody>
+                          </table>
+                      </td>
+                  </tr>
+              </tbody>
+          </table><!-- End -->
+          </body>';
+
+
+          return $mailHTML;
+      }
+      
+    public function buildBodyRespuestaEdicion ( $nombre_po, $nombre_asesor, $accion, $link_po){
+
+            $mailHTML = '<head>
+            <title></title>
+            <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+            <meta content="width=device-width, initial-scale=1.0" name="viewport"/><!--[if mso]><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch><o:AllowPNG/></o:OfficeDocumentSettings></xml><![endif]-->
+            <style>
+                * {
+                    box-sizing: border-box;
+                }
+
+                body {
+                    margin: 0;
+                    padding: 0;
+                }
+
+                a[x-apple-data-detectors] {
+                    color: inherit !important;
+                    text-decoration: inherit !important;
+                }
+
+                #MessageViewBody a {
+                    color: inherit;
+                    text-decoration: none;
+                }
+
+                p {
+                    line-height: inherit
+                }
+
+                .desktop_hide,
+                .desktop_hide table {
+                    mso-hide: all;
+                    display: none;
+                    max-height: 0px;
+                    overflow: hidden;
+                }
+
+                .image_block img+div {
+                    display: none;
+                }
+
+                @media (max-width:620px) {
+                    .mobile_hide {
+                        display: none;
+                    }
+
+                    .row-content {
+                        width: 100% !important;
+                    }
+
+                    .stack .column {
+                        width: 100%;
+                        display: block;
+                    }
+
+                    .mobile_hide {
+                        min-height: 0;
+                        max-height: 0;
+                        max-width: 0;
+                        overflow: hidden;
+                        font-size: 0px;
+                    }
+
+                    .desktop_hide,
+                    .desktop_hide table {
+                        display: table !important;
+                        max-height: none !important;
+                    }
+
+                    .row-1 .column-1 .block-1.paragraph_block td.pad>div,
+                    .row-3 .column-1 .block-1.paragraph_block td.pad>div,
+                    .row-5 .column-1 .block-1.paragraph_block td.pad>div {
+                        text-align: center !important;
+                        font-size: 14px !important;
+                    }
+
+                    .row-1 .column-1 .block-1.paragraph_block td.pad,
+                    .row-3 .column-1 .block-1.paragraph_block td.pad,
+                    .row-5 .column-1 .block-1.paragraph_block td.pad {
+                        padding: 20px 35px !important;
+                    }
+
+                    .row-1 .column-1,
+                    .row-3 .column-1,
+                    .row-4 .column-1,
+                    .row-5 .column-1 {
+                        padding: 0 !important;
+                    }
+                }
+            </style>
+            </head>
+            <body style="background-color: #e4e7e7; margin: 0; padding: 0; -webkit-text-size-adjust: none; text-size-adjust: none;">
+            <table border="0" cellpadding="0" cellspacing="0" class="nl-container" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #e4e7e7;" width="100%">
+                <tbody>
+                    <tr>
+                        <td>
+                            <table align="center" border="0" cellpadding="0" cellspacing="0" class="row row-1" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #cdd2d9;" width="100%">
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <table align="center" border="0" cellpadding="0" cellspacing="0" class="row-content stack" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #56adff; color: #000; width: 600px; margin: 0 auto;" width="600">
+                                                <tbody>
+                                                    <tr>
+                                                        <td class="column column-1" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; font-weight: 400; text-align: left; vertical-align: top; border-top: 0px; border-right: 0px; border-bottom: 0px; border-left: 0px;" width="100%">
+                                                            <table border="0" cellpadding="0" cellspacing="0" class="paragraph_block block-1" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;" width="100%">
+                                                                <tr>
+                                                                    <td class="pad">
+                                                                        <div style="color:#041e41;direction:ltr;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;font-size:6px;font-weight:400;letter-spacing:0px;line-height:150%;text-align:justify;mso-line-height-alt:9px;"> </div>
+                                                                    </td>
+                                                                </tr>
+                                                            </table>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <table align="center" border="0" cellpadding="0" cellspacing="0" class="row row-3" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #cdd2d9;" width="100%">
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <table align="center" border="0" cellpadding="0" cellspacing="0" class="row-content stack" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #fff; color: #000; width: 600px; margin: 0 auto;" width="600">
+                                                <tbody>
+                                                    <tr>
+                                                        <td class="column column-1" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; font-weight: 400; text-align: left; vertical-align: top; border-top: 0px; border-right: 0px; border-bottom: 0px; border-left: 0px;" width="100%">
+                                                            <table border="0" cellpadding="0" cellspacing="0" class="paragraph_block block-1" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;" width="100%">
+                                                                <tr>
+                                                                    <td class="pad" style="padding-bottom:25px;padding-left:50px;padding-right:50px;padding-top:25px;">
+                                                                        <div style="color:#041e41;direction:ltr;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;font-size:16px;font-weight:400;letter-spacing:0px;line-height:150%;text-align:justify;mso-line-height-alt:24px;">
+                                                                            <p style="margin: 0; margin-bottom: 16px;">Hola!</p>
+                                                                            <p style="margin: 0; margin-bottom: 16px;">Te informamos que tu solicitud para la edición de Origen del prospecto: <a id="linkPO" href="' . $link_po . '"> <strong>'.$nombre_po.'</strong></a> ha sido <strong>'.$accion.'</strong> , por <strong>'.$nombre_asesor.'</strong> .</p>
+                                                                            <br/>
+                                                                            <p style="margin: 0;">Atentamente, UNIFIN.</p>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            </table>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <table align="center" border="0" cellpadding="0" cellspacing="0" class="row row-4" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #cdd2d9;" width="100%">
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <table align="center" border="0" cellpadding="0" cellspacing="0" class="row-content stack" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #fff; color: #000; width: 600px; margin: 0 auto;" width="600">
+                                                <tbody>
+                                                    <tr>
+                                                        <td class="column column-1" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; font-weight: 400; text-align: left; padding-bottom: 15px; padding-left: 15px; padding-right: 15px; padding-top: 15px; vertical-align: top; border-top: 0px; border-right: 0px; border-bottom: 0px; border-left: 0px;" width="100%">
+                                                            <table border="0" cellpadding="0" cellspacing="0" class="image_block block-1" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+                                                                <tr>
+                                                                    <td class="pad" style="padding-bottom:20px;width:100%;">
+                                                                        <div align="center" class="alignment" style="line-height:10px"><img src="cid:Copia_de_Recurso-2unileasingazulLOW" style="display: block; height: auto; border: 0; max-width: 102px; width: 100%;" width="102"/></div>
+                                                                    </td>
+                                                                </tr>
+                                                            </table>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <table align="center" border="0" cellpadding="0" cellspacing="0" class="row row-5" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #cdd2d9;" width="100%">
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <table align="center" border="0" cellpadding="0" cellspacing="0" class="row-content stack" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #dde1e9; color: #000; width: 600px; margin: 0 auto;" width="600">
+                                                <tbody>
+                                                    <tr>
+                                                        <td class="column column-1" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; font-weight: 400; text-align: left; vertical-align: top; border-top: 0px; border-right: 0px; border-bottom: 0px; border-left: 0px;" width="100%">
+                                                            <table border="0" cellpadding="0" cellspacing="0" class="paragraph_block block-1" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;" width="100%">
+                                                                <tr>
+                                                                    <td class="pad" style="padding-bottom:25px;padding-left:30px;padding-right:30px;padding-top:25px;">
+                                                                        <div style="color:#000000;direction:ltr;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;font-size:12px;font-weight:400;letter-spacing:0px;line-height:120%;text-align:center;mso-line-height-alt:14.399999999999999px;">
+                                                                            <p style="margin: 0;"><em>Información confidencial y exclusiva para uso interno de Unifin.</em></p>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            </table>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                </tbody>
+            </table><!-- End -->
+            </body>';
+
+
+            return $mailHTML;
+        }
 
 }
-
