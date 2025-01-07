@@ -1,6 +1,6 @@
 <?php
- // created: 2024-04-09 19:47:57
-$dictionary['Prospect']['fields']['asesor_alianza_c']['labelValue']='Asesor Alianza';
+ // created: 2025-01-06 20:10:38
+$dictionary['Prospect']['fields']['asesor_alianza_c']['labelValue']='Asesor de la Alianza';
 $dictionary['Prospect']['fields']['asesor_alianza_c']['full_text_search']=array (
   'enabled' => '0',
   'boost' => '1',
