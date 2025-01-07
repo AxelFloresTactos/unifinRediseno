@@ -29,13 +29,13 @@
      'existsEmail'
  );
 
- $hook_array['before_save'][] = Array(
-     5,
-     'Se llena Macro Sector',
-     'custom/modules/Prospects/clasifica_sectorial.php',
-     'clasifica_sectorial_class',
-     'clasifica_sectorial_function'
- );
+//  $hook_array['before_save'][] = Array(
+//      5,
+//      'Se llena Macro Sector',
+//      'custom/modules/Prospects/clasifica_sectorial.php',
+//      'clasifica_sectorial_class',
+//      'clasifica_sectorial_function'
+//  );
  $hook_array['before_save'][] = Array(
      6,
      'Validacion de duplicados RFC',
