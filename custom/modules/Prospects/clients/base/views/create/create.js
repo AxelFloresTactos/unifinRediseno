@@ -475,7 +475,7 @@
         var campos = "";
 
         var tipoPersona = this.model.get('regimen_fiscal_c');
-        var campos_req = ['phone_mobile','email','zona_geografica_c'];
+        var campos_req = ['phone_mobile','email','zona_geografica_c', 'activos_interes_c', 'potencial_cierre_c', 'mes_operacion_c'];
 
         if (tipoPersona!='3'){
             campos_req.push('nombre_c', 'apellido_paterno_c', 'apellido_materno_c');
@@ -523,6 +523,16 @@
             errors['phone_work'] = errors['phone_work'] || {};
             errors['phone_work'].required = true;
         }
+        //ACTIVIDAD ECONOMICA REQUERIDO
+        if (this.model.get('actividad_economica_c') == '' || this.model.get('actividad_economica_c') == '0' || this.model.get('actividad_economica_c') == null) {
+            campos = campos + '<b>' + 'Actividad Económica' + '</b><br>';
+            $('.campoAE .record-label').css('color', '#bb0e1b');
+            $('.list_ae .select2-choice').css('border', '1px solid #bb0e1b');
+
+            errors['actividad_economica_c'] = errors['actividad_economica_c'] || {};
+            errors['actividad_economica_c'].required = true;
+        }
+
         if (campos) {
             app.alert.show("Campos Requeridos", {
                 level: "error",
