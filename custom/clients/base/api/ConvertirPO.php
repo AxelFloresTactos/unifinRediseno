@@ -42,7 +42,35 @@ class ConvertirPO extends SugarApi
                 $relacionesCuenta = $this->getRelacionesCuenta($beanCuenta);
 
                 $idCuentaRecuperada = $this->validaExistenciaPOenCuenta( $beanPO->email1, $beanPO->rfc_c );
-                //$idCuentaRecuperada = $this->validaExistenciaPOenCuenta( "llamados@yopmail.com" );
+                
+                /*
+                   Valida Origen de Cuenta-Cliente,
+                   Si;
+                    - Estatus atención = Atendido, no hay afectación en origen
+                    - Estatus atención != Atendido, actualiza origen con valor de PO
+                    estatus_atencion; 1= Atendido, 2=Desatendido
+                */
+                $queryE = "select u.id, u.tipo_producto, u.estatus_atencion
+                    from uni_productos u
+                    	inner join accounts_uni_productos_1_c au on au.accounts_uni_productos_1uni_productos_idb = u.id
+                    where au.deleted=0
+                    	and u.deleted=0
+                    	and u.tipo_producto=1
+                    	and au.accounts_uni_productos_1accounts_ida='{$idCuenta}'
+                    limit 1
+                    ;";
+                $estadoAtencion = $GLOBALS['db']->query($queryE);
+                $desatendido = true;
+                while ($row = $GLOBALS['db']->fetchByAssoc($estadoAtencion)) {
+                  if($row['estatus_atencion'] == '1'){
+                      $desatendido = false;
+                  }
+                }
+                if($desatendido){
+                    $beanCuenta->origen_cuenta_c = $beanPO->origen_c;
+                    $beanCuenta->detalle_origen_c = $beanPO->detalle_origen_c;
+                    $beanCuenta->save();
+                }
                 
                 //El PO ya existe en cuentas
                 if( $idCuentaRecuperada != '' ){
@@ -112,6 +140,14 @@ class ConvertirPO extends SugarApi
                     );
 
                 }
+                /*if(!empty($beanPO->account_id2_c)){
+                    $beanContacto = BeanFactory::retrieveBean('Accounts', $beanPO->account_id2_c, array('disable_row_level_security' => true));
+                    if( $beanContacto->origen_cuenta_c=='1' || empty($beanContacto->origen_cuenta_c) || $beanContacto->detalle_origen_c=='12' || $beanContacto->detalle_origen_c=='80' ){ // 12:Leasing - 80:Organico
+                        $beanContacto->origen_cuenta_c = $beanPO->origen_c;
+                        $beanContacto->detalle_origen_c = $beanPO->detalle_origen_c;
+                        $beanContacto->save();
+                    }
+                }*/
 
             }else{
                 $response = array(

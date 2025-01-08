@@ -132,5 +132,10 @@ class Prospects_AsignacionPO
             }
           }        
         }
+        
+        //Valida Bloqueo de Origen
+        if( ($bean->origen_c!='' && $bean->fetched_row['origen_c'] != $bean->origen_c) || ($bean->detalle_origen_c!='' && $bean->fetched_row['detalle_origen_c'] != $bean->detalle_origen_c )){
+            $bean->origen_bloqueado_c = true;
+        }
     }
 }

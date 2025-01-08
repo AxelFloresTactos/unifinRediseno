@@ -10,6 +10,311 @@ array (
         'buttons' => 
         array (
           0 => 
+          'type' => 'rowaction',
+          'event' => 'button:edit_button:click',
+          'name' => 'edit_button',
+          'label' => 'LBL_EDIT_BUTTON_LABEL',
+          'acl_action' => 'edit',
+        ),
+        1 => 
+        array (
+          'type' => 'pdfaction',
+          'name' => 'download-pdf',
+          'label' => 'LBL_PDF_VIEW',
+          'action' => 'download',
+          'acl_action' => 'view',
+        ),
+        2 => 
+        array (
+          'type' => 'pdfaction',
+          'name' => 'email-pdf',
+          'label' => 'LBL_PDF_EMAIL',
+          'action' => 'email',
+          'acl_action' => 'view',
+        ),
+        3 => 
+        array (
+          'type' => 'divider',
+        ),
+        4 => 
+        array (
+          'name' => 'convert_po_to_Lead',
+          'type' => 'rowaction',
+          'label' => 'LBL_CONVERT_LEADS_BUTTON_LABEL',
+          'acl_action' => 'view',
+          'event' => 'button:convert_po_to_Lead:click',
+          'class' => 'btn_convertLeads',
+        ),
+        5 => 
+        array (
+          'type' => 'divider',
+        ),
+        6 => 
+        array (
+          'type' => 'rowaction',
+          'event' => 'button:historical_summary_button:click',
+          'name' => 'historical_summary_button',
+          'label' => 'LBL_HISTORICAL_SUMMARY',
+          'acl_action' => 'view',
+        ),
+        7 => 
+        array (
+          'type' => 'rowaction',
+          'event' => 'button:audit_button:click',
+          'name' => 'audit_button',
+          'label' => 'LNK_VIEW_CHANGE_LOG',
+          'acl_action' => 'view',
+        ),
+        8 => 
+        array (
+          'type' => 'divider',
+        ),
+        9 => 
+        array (
+          'type' => 'rowaction',
+          'event' => 'button:delete_button:click',
+          'name' => 'delete_button',
+          'label' => 'LBL_DELETE_BUTTON_LABEL',
+          'acl_action' => 'delete',
+        ),
+        10 => 
+        array (
+          'type' => 'divider',
+        ),
+        11 => 
+        array (
+          'type' => 'rowaction',
+          'event' => 'button:reenvio_correo:click',
+          'name' => 'reenvio_correo',
+          'label' => 'Reenvío Correo',
+          'acl_action' => 'view',
+        ),
+        12 => 
+        array (
+          'type' => 'rowaction',
+          'event' => 'button:cambiar_origen:click',
+          'name' => 'cambiar_origen',
+          'label' => 'Solicitar Cambio Origen',
+          'acl_action' => 'view',
+        ),
+      ),
+    ),
+    5 => 
+    array (
+      'name' => 'sidebar_toggle',
+      'type' => 'sidebartoggle',
+    ),
+  ),
+  'panels' => 
+  array (
+    0 => 
+    array (
+      'name' => 'panel_header',
+      'header' => true,
+      'fields' => 
+      array (
+        0 => 
+        array (
+          'name' => 'picture',
+          'type' => 'avatar',
+          'size' => 'large',
+          'readonly' => true,
+          'dismiss_label' => true,
+        ),
+        1 => 
+        array (
+          'name' => 'name_c',
+        ),
+        2 => 
+        array (
+          'name' => 'favorite',
+          'label' => 'LBL_FAVORITE',
+          'type' => 'favorite',
+          'dismiss_label' => true,
+        ),
+        3 => 
+        array (
+          'name' => 'follow',
+          'label' => 'LBL_FOLLOW',
+          'type' => 'follow',
+          'readonly' => true,
+          'dismiss_label' => true,
+        ),
+      ),
+    ),
+    1 => 
+    array (
+      'name' => 'panel_body',
+      'label' => 'LBL_RECORD_BODY',
+      'columns' => 2,
+      'labels' => true,
+      'labelsOnTop' => true,
+      'placeholders' => true,
+      'newTab' => false,
+      'panelDefault' => 'expanded',
+      'fields' => 
+      array (
+        0 => 
+        array (
+          'readonly' => false,
+          'name' => 'estatus_po_c',
+          'label' => 'LBL_ESTATUS_PO',
+        ),
+        1 => 
+        array (
+          'readonly' => false,
+          'name' => 'subestatus_po_c',
+          'label' => 'LBL_SUBESTATUS_PO',
+        ),
+        2 => 
+        array (
+          'readonly' => false,
+          'name' => 'detalle_subestatus_po_c',
+          'label' => 'LBL_DETALLE_SUBESTATUS_PO',
+        ),
+        3 => 
+        array (
+        ),
+        4 => 
+        array (
+          'readonly' => false,
+          'name' => 'regimen_fiscal_c',
+          'label' => 'LBL_REGIMEN_FISCAL_C',
+        ),
+        5 => 
+        array (
+          'readonly' => false,
+          'name' => 'nombre_empresa_c',
+          'label' => 'LBL_NOMBRE_EMPRESA_C',
+        ),
+        6 => 
+        array (
+          'readonly' => false,
+          'name' => 'nombre_c',
+          'label' => 'LBL_NOMBRE_C',
+        ),
+        7 => 
+        array (
+          'readonly' => false,
+          'name' => 'apellido_paterno_c',
+          'label' => 'LBL_APELLIDO_PATERNO_C',
+        ),
+        8 => 
+        array (
+          'readonly' => false,
+          'name' => 'apellido_materno_c',
+          'label' => 'LBL_APELLIDO_MATERNO_C',
+        ),
+        9 => 
+        array (
+          'readonly' => false,
+          'name' => 'genero_c',
+          'label' => 'LBL_GENERO',
+        ),
+        10 => 
+        array (
+          'readonly' => false,
+          'name' => 'empresa_po_c',
+          'label' => 'LBL_EMPRESA_PO',
+        ),
+        11 => 
+        array (
+          'readonly' => true,
+          'name' => 'compania_po_c',
+          'label' => 'LBL_COMPANIA_PO',
+        ),
+        12 => 
+        array (
+          'readonly' => false,
+          'name' => 'puesto_c',
+          'label' => 'LBL_PUESTO_C',
+        ),
+        13 => 
+        array (
+          'readonly' => false,
+          'name' => 'read_only_empresa_c',
+          'label' => 'LBL_READ_ONLY_EMPRESA',
+        ),
+        14 => 
+        array (
+          'readonly' => false,
+          'name' => 'origen_c',
+          'label' => 'LBL_ORIGEN_C',
+        ),
+        15 => 
+        array (
+          'readonly' => false,
+          'name' => 'detalle_origen_c',
+          'label' => 'LBL_DETALLE_ORIGEN_C',
+        ),
+        16 => 
+        array (
+          'readonly' => false,
+          'name' => 'medio_digital_c',
+          'label' => 'LBL_MEDIO_DIGITAL',
+        ),
+        17 => 
+        array (
+        ),
+        18 => 
+        array (
+          'readonly' => false,
+          'name' => 'referido_cliente_prov_c',
+          'studio' => 'visible',
+          'label' => 'LBL_REFERIDO_CLIENTE_PROV',
+        ),
+        19 => 
+        array (
+        ),
+        20 => 
+        array (
+          'readonly' => false,
+          'name' => 'codigo_expo_c',
+          'label' => 'LBL_CODIGO_EXPO',
+        ),
+        21 => 
+        array (
+        ),
+        22 => 
+        array (
+          'readonly' => false,
+          'name' => 'prospeccion_propia_c',
+          'label' => 'LBL_PROSPECCION_PROPIA',
+        ),
+        23 => 
+        array (
+        ),
+        24 => 
+        array (
+          'readonly' => false,
+          'name' => 'evento_c',
+          'label' => 'LBL_EVENTO',
+        ),
+        25 => 
+        array (
+        ),
+        26 => 
+        array (
+          'readonly' => false,
+          'name' => 'camara_c',
+          'label' => 'LBL_CAMARA_C',
+        ),
+        27 => 
+        array (
+        ),
+        28 => 
+        array (
+          'readonly' => false,
+          'name' => 'promotor_c',
+          'studio' => 'visible',
+          'label' => 'LBL_PROMOTOR',
+        ),
+        29 => 
+        array (
+        ),
+        30 => 
+        array (
+          'related_fields' => 
           array (
             'type' => 'button',
             'name' => 'rechaza_envio_correo',
@@ -800,7 +1105,23 @@ array (
         array (
           'useTabs' => false,
         ),
+        34 => 
+        array (
+          'readonly' => false,
+          'name' => 'origen_bloqueado_c',
+          'label' => 'LBL_ORIGEN_BLOQUEADO_C',
+        ),
+        35 => 
+        array (
+          'readonly' => false,
+          'name' => 'aprueba_cambio_origen_c',
+          'label' => 'LBL_APRUEBA_CAMBIO_ORIGEN_C',
+        ),
       ),
     ),
+  ),
+  'templateMeta' => 
+  array (
+    'useTabs' => false,
   ),
 );

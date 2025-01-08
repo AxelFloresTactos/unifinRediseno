@@ -93,3 +93,5 @@ $mod_strings['LBL_FRANQUICIA_C'] = 'Franquicia';
 $mod_strings['LBL_ASESOR_ALIANZA_C'] = 'Asesor de la Alianza';
 $mod_strings['LBL_EMAIL_AA_C'] = 'Email del Asesor de Alianza';
 $mod_strings['LBL_TELEFONO_AA_C'] = 'Teléfono del Asesor de Alianza';
+$mod_strings['LBL_APRUEBA_CAMBIO_ORIGEN'] = 'Aprueba cambio origen';
+$mod_strings['LBL_ORIGEN_BLOQUEADO'] = 'Origen bloqueado';

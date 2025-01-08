@@ -219,14 +219,19 @@
             $("#CL").html("Rechazado");
             //Valida subetapas
             if(subetapa=="CM"){
-                $("#SE4").removeClass('ocult');
-                $('#SE4').addClass('error');
-                $("#SE4").html("Rechazada Comité");
+                $("#SE5").removeClass('ocult');
+                $('#SE5').addClass('error');
+                $("#SE5").html("Rechazada Comité");
             }
             if(subetapa=="R"){
-                $("#SE4").removeClass('ocult');
-                $('#SE4').addClass('error');
-                $("#SE4").html("Rechazada Crédito");
+                $("#SE5").removeClass('ocult');
+                $('#SE5').addClass('error');
+                $("#SE5").html("Rechazada Crédito");
+            }
+            if(subetapa=="RV"){
+                $("#SE5").removeClass('ocult');
+                $('#SE5').addClass('error');
+                $("#SE5").html("Rechazada Visita Ocular");
             }
 
         }
