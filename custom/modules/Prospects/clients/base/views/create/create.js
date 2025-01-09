@@ -49,6 +49,9 @@
         //Función para eliminar opciones del campo origen
         this.estableceOpcionesOrigenLeads();
         this.model.on("change:origen_c", _.bind(this.estableceOpcionesOrigenLeads, this));
+        //Función para establecer el año y el mes actual + 2 futuros
+        this._estableceMesOperacion();
+        this.model.on("change:mes_operacion_c", _.bind(this._estableceMesOperacion, this));
     },
 
     delegateButtonEvents: function() {
@@ -1070,5 +1073,38 @@
         else {
           callback(null, fields, errors);
         }
+    },
+
+    _estableceMesOperacion:function () {
+        // Obtener fecha actual
+        var fechaActual = new Date();
+        var yyyy = fechaActual.getFullYear();
+        var mm = fechaActual.getMonth() + 1; 
+        if (mm < 10) {
+            mm = '0' + mm;
+        }
+        // Calcular los próximos dos meses en el mismo formato 'YYYYMM'
+        var proximosMeses = [];
+        for (var i = 0; i < 3; i++) {
+            var nuevoMes = new Date(yyyy, mm - 1 + i); 
+            var nuevoYYYY = nuevoMes.getFullYear();
+            var nuevoMM = nuevoMes.getMonth() + 1;
+            if (nuevoMM < 10) {
+                nuevoMM = '0' + nuevoMM;
+            }
+            proximosMeses.push(parseInt(`${nuevoYYYY}${nuevoMM}`));
+        }
+        // Obtener lista de valores y filtrar
+        var lista_mes_operacion = app.lang.getAppListStrings('mes_operacion_list');
+        var nuevaLista = {};
+
+        Object.keys(lista_mes_operacion).forEach(function (key) {
+            var claveNumerica = parseInt(key); // Convertir clave a número para comparación
+            if (proximosMeses.includes(claveNumerica)) {
+                nuevaLista[key] = lista_mes_operacion[key]; // Conservar solo los permitidos
+            }
+        });
+        // Actualizar opciones del campo
+        this.model.fields['mes_operacion_c'].options = nuevaLista;
     },
 })
