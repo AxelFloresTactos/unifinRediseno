@@ -71,31 +71,34 @@
                     if ($accion === 'aceptar') {
                         //Valida estauts actual y desbloque PO
                         if($beanProspect->origen_bloqueado_c){
-                          $beanProspect->origen_bloqueado_c = false;
-                          $beanProspect->aprueba_cambio_origen_c = 'Aceptar';
-                          $beanProspect->save();
-                          
-                          //Consumir servicio para enviar correo, declarado en custom api
-                          require_once("custom/clients/base/api/SendEmailPO.php");
-                          $apiSendEmailPO= new SendEmailPO();
-                          $body=array(
-                              'id_po'=>$beanProspect->id,
-                              'id_usuario'=>$current_user->id,
-                              'accion'=>'Aceptada'
-                          );
-                          $response=$apiSendEmailPO->notificaCambioOrigen(null,$body);
-                          if ($response['status']=='200') {
-                              echo '<div class="message success">Se autorizo el cambio de origen exitosamente!</div>';
-                          } else{
-                              echo '<div class="message warning">Se ha presentado un error</div>';
-                          }
-                    
+                            if($beanProspect->aprueba_cambio_origen_c == 'RECHAZAR'){
+                                echo '<div class="message warning">La solicitud fue rechazada previamente</div>';
+                            }else{
+                                $beanProspect->origen_bloqueado_c = false;
+                                $beanProspect->aprueba_cambio_origen_c = 'Aceptar';
+                                $beanProspect->save();
+                                
+                                //Consumir servicio para enviar correo, declarado en custom api
+                                require_once("custom/clients/base/api/SendEmailPO.php");
+                                $apiSendEmailPO= new SendEmailPO();
+                                $body=array(
+                                    'id_po'=>$beanProspect->id,
+                                    'id_usuario'=>$current_user->id,
+                                    'accion'=>'Aceptada'
+                                );
+                                $response=$apiSendEmailPO->notificaCambioOrigen(null,$body);
+                                if ($response['status']=='200') {
+                                    echo '<div class="message success">Se autorizo el cambio de origen exitosamente!</div>';
+                                } else{
+                                    echo '<div class="message warning">Se ha presentado un error</div>';
+                                }
+                            }
                         }else{
-                          echo '<div class="message neutral">El PO no se encuentra bloqueado actualmente</div>';
+                            echo '<div class="message neutral">El PO no se encuentra bloqueado actualmente</div>';
                         }
                     } elseif ($accion === 'rechazar') {
                         //Valida estauts actual y rechaza PO
-                        if($beanProspect->origen_bloqueado_c && $beanProspect->aprueba_cambio_origen_c != 'Rechazar'){
+                        if($beanProspect->origen_bloqueado_c && $beanProspect->aprueba_cambio_origen_c != 'RECHAZAR'){
                             $beanProspect->aprueba_cambio_origen_c = 'Rechazar';
                             $beanProspect->save();
                             
@@ -109,7 +112,7 @@
                             );
                             $response=$apiSendEmailPO->notificaCambioOrigen(null,$body);
                             if ($response['status']=='200') {
-                                echo '<div class="message warning">Se rechazo el cambio de origen existosamente</div>';
+                                echo '<div class="message warning">Se rechazo el cambio de origen exitosamente</div>';
                             } else{
                                 echo '<div class="message warning">Se ha presentado un error</div>';
                             }
