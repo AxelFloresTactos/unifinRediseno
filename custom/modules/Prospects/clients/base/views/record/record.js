@@ -413,6 +413,22 @@
                 break;
         }
 
+        if (this.model.get('origen_c') == '12' && (this.model.get('detalle_origen_c') == '12' || this.model.get('detalle_origen_c') == '13')) {
+            //CAMPOS REQUERIDOS DE ALIANZAS
+            if (this.model.get('franquicia_c') == '' || this.model.get('franquicia_c') == null) {
+                campos_req.push('franquicia_c');
+            }
+            if (this.model.get('asesor_alianza_c') == '' || this.model.get('asesor_alianza_c') == null) {
+                campos_req.push('asesor_alianza_c');
+            }
+            if (this.model.get('email_aa_c') == '' || this.model.get('email_aa_c') == null) {
+                campos_req.push('email_aa_c');
+            }
+            if (this.model.get('telefono_aa_c') == '' || this.model.get('telefono_aa_c') == null) {
+                campos_req.push('telefono_aa_c');
+            }
+        }
+
         if (campos_req.length > 0) {
 
             for (i = 0; i < campos_req.length; i++) {
