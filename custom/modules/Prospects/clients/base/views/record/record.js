@@ -162,6 +162,26 @@
             }
         }
 
+        if (this.model.get('origen_c') == '12' && (this.model.get('detalle_origen_c') == '12' || this.model.get('detalle_origen_c') == '13')) {
+            //VALIDA FORMATO DE EMAIL DEL ASESOR DE ALIANZA
+            if (this.model.get('email_aa_c') != null && this.model.get('email_aa_c') !== "") {
+
+                var inputEAA = this.model.get('email_aa_c'); // Obtenemos el email
+                var expresionEAA = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Expresión regular válida para emails
+
+                if (!expresionEAA.test(inputEAA)) {
+                    // Si el formato del email no es válido, mostramos el error
+                    app.alert.show('Error al validar email AA', {
+                        level: 'error',
+                        autoClose: false,
+                        messages: '<b>Formato de Email del Asesor de Alianza Incorrecto.</b>'
+                    });
+                    errors['email_aa_c'] = errors['email_aa_c'] || {};
+                    errors['email_aa_c'].required = true;
+                }
+            }
+        }
+
         callback(null, fields, errors);
     },
 
@@ -288,6 +308,22 @@
                 });
             }
         }
+
+        if (this.model.get('origen_c') == '12' && (this.model.get('detalle_origen_c') == '12' || this.model.get('detalle_origen_c') == '13')) {
+            //VALIDA LA LONGITUD DE 10 DIGITOS DEL NUMERO TELEFONICO DEL ASESOR DE ALIANZA
+            if (this.model.get('telefono_aa_c') != "" && this.model.get('telefono_aa_c') != null) {
+                if (this.model.get('telefono_aa_c').trim() == "" || this.model.get('telefono_aa_c').trim().length != 10) {
+                    app.alert.show('telefono_aa_invalido', {
+                        level: 'error',
+                        autoClose: false,
+                        messages: 'Se requiere un teléfono válido de <b>10 dígitos</b> para el <b>Teléfono del Asesor de Alianza</b>'
+                    });
+                    errors['telefono_aa_c'] = errors['telefono_aa_c'] || {};
+                    errors['telefono_aa_c'].required = true;
+                }
+            }
+        }
+
         callback(null, fields, errors);
     },
 
@@ -411,6 +447,22 @@
 
             default:
                 break;
+        }
+
+        if (this.model.get('origen_c') == '12' && (this.model.get('detalle_origen_c') == '12' || this.model.get('detalle_origen_c') == '13')) {
+            //CAMPOS REQUERIDOS DE ALIANZAS
+            if (this.model.get('franquicia_c') == '' || this.model.get('franquicia_c') == null) {
+                campos_req.push('franquicia_c');
+            }
+            if (this.model.get('asesor_alianza_c') == '' || this.model.get('asesor_alianza_c') == null) {
+                campos_req.push('asesor_alianza_c');
+            }
+            if (this.model.get('email_aa_c') == '' || this.model.get('email_aa_c') == null) {
+                campos_req.push('email_aa_c');
+            }
+            if (this.model.get('telefono_aa_c') == '' || this.model.get('telefono_aa_c') == null) {
+                campos_req.push('telefono_aa_c');
+            }
         }
 
         if (campos_req.length > 0) {
