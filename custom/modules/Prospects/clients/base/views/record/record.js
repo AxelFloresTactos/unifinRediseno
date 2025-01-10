@@ -1099,6 +1099,15 @@
         /*
           Valida que tenga origen bloqueado
         */
+        if(this.model.get("estatus_po_c") == '3'){
+          app.alert.show('convertido_po', {
+              level: 'error',
+              autoClose: false,
+              messages: 'No puedes solicitar cambio en un PO convertido'
+          });
+          return false;
+        }
+
         if(!App.user.attributes.define_origen_po_c){
           app.alert.show('not_access', {
               level: 'error',
