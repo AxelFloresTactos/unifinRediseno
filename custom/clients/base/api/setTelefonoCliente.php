@@ -15,7 +15,7 @@ class setTelefonoCliente extends SugarApi
                 //request type
                 'reqType' => 'POST',
                 //set authentication
-                'noLoginRequired' => true,
+                'noLoginRequired' => false,
                 //endpoint path
                 'path' => array('setTelefonoCliente'),
                 //endpoint variables
