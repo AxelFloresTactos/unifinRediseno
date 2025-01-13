@@ -514,7 +514,7 @@
         var campos = "";
 
         var tipoPersona = this.model.get('regimen_fiscal_c');
-        var campos_req = ['phone_mobile','email','zona_geografica_c', 'activos_interes_c', 'potencial_cierre_c', 'mes_operacion_c'];
+        var campos_req = ['phone_mobile','email','zona_geografica_c', 'activos_interes_c', 'potencial_cierre_c', 'mes_operacion_c', 'potencial_lead_c'];
 
         if (tipoPersona!='3'){
             campos_req.push('nombre_c', 'apellido_paterno_c', 'apellido_materno_c');
