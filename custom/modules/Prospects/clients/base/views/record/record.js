@@ -66,6 +66,12 @@
         //Función para establecer el año y el mes actual + 2 futuros
         this._estableceMesOperacion();
         this.model.on("change:mes_operacion_c", _.bind(this._estableceMesOperacion, this));
+        //Valida 3 activos maximo
+        this.model.addValidationTask('validate_activo_interes', _.bind(this._validateActivoInteres, this));
+        this.model.on("change:activos_interes_c", this._validateActivoInteres, this);
+        //Valida el potencial de cierre debe ser entre 10 y 100%
+        this.model.addValidationTask('validate_potencial_cierre', _.bind(this._validatePotencialCierre, this));
+        this.model.on("change:potencial_cierre_c", this._validatePotencialCierre, this);
     },
 
     handleEdit: function(e, cell) {
@@ -1846,6 +1852,36 @@
         });
         // Actualizar opciones del campo
         this.model.fields['mes_operacion_c'].options = nuevaLista;
+    },
+
+    _validateActivoInteres: function(fields, errors, callback) {
+        var activosInteres = this.model.get('activos_interes_c');
+        //VALIDA QUE SOLO SEAN 3 ACTIVOS DE INTERES
+        if (activosInteres && activosInteres.length > 3) {
+            app.alert.show("valida_activo_interes", {
+                level: "error",
+                messages: "<b>Favor de seleccionar solo 3 activos de interés.</b>",
+                autoClose: false
+            });
+            errors['activos_interes_c'] = errors['activos_interes_c'] || {};
+            errors['activos_interes_c'].required = true;
+        }
+        callback(null, fields, errors);
+    },
+
+    _validatePotencialCierre: function(fields, errors, callback) {
+        var potencialCierre = this.model.get('potencial_cierre_c');
+        //Valida el potencial de cierre debe ser entre 10 y 100%
+        if (potencialCierre !== null && (potencialCierre < 10 || potencialCierre > 100)) {
+            app.alert.show("valida_potencial_cierre", {
+                level: "error",
+                messages: "<b>El potencial de cierre debe ser entre 10 y 100%.</b>",
+                autoClose: false
+            });
+            errors['potencial_cierre_c'] = errors['potencial_cierre_c'] || {};
+            errors['potencial_cierre_c'].required = true;
+        }
+        callback(null, fields, errors);
     },
 
 })
