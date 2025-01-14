@@ -1,7 +1,8 @@
 <?php
- // created: 2025-01-08 19:14:53
+ // created: 2025-01-13 20:47:31
 
 $app_list_strings['mes_operacion_list']=array (
+  '' => '',
   202501 => 'ENERO - 2025',
   202502 => 'FEBRERO - 2025',
   202503 => 'MARZO - 2025',
