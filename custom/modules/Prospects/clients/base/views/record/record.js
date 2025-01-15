@@ -30,6 +30,7 @@
         this.model.addValidationTask('check_TextOnly', _.bind(this.checkTextOnly, this));
         this.model.addValidationTask('change:email', _.bind(this.expmail, this));
         this.events['keydown [name=ventas_anuales_c]'] = 'checkInVentas';
+        this.events['keydown [name=potencial_lead_c]'] = 'checkInVentas';
         this.context.on('button:llamada_mobile:click', this.llamar_movil, this);
         this.context.on('button:llamada_home:click', this.llamar_casa, this);
         this.context.on('button:llamada_work:click', this.llamar_trabajo, this);
@@ -753,7 +754,7 @@
             app.alert.show('error_dinero', {
                 level: 'error',
                 autoClose: true,
-                messages: 'El campo no acepta Caracteres Especiales.'
+                messages: '<b>El campo no acepta Caracteres Especiales.</b>'
             });
             return "false";
         }
@@ -787,7 +788,7 @@
             app.alert.show('error_dinero', {
                 level: 'error',
                 autoClose: true,
-                messages: 'El campo no acepta caracteres especiales.'
+                messages: '<b>El campo no acepta caracteres especiales.</b>'
             });
             return "false";
         }
