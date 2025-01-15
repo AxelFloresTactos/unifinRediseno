@@ -27,6 +27,7 @@
         //Validation task que muestra modal sobre duplicados
         //this.model.addValidationTask('check_duplicados_modal', _.bind(this.check_duplicados_modal, this));
         this.events['keydown [name=ventas_anuales_c]'] = 'checkInVentas';
+        this.events['keydown [name=potencial_lead_c]'] = 'checkInVentas';
         this.on('render', this._hidechkLeadCancelado, this);
         this.model.addValidationTask('setCleanName', _.bind(this.cleanName, this));
         this.model.on("change:regimen_fiscal_c", _.bind(this._cleanRegFiscal, this));
@@ -797,7 +798,7 @@
             app.alert.show('error_dinero', {
                 level: 'error',
                 autoClose: true,
-                messages: 'El campo no acepta Caracteres Especiales.'
+                messages: '<b>El campo no acepta Caracteres Especiales.</b>'
             });
             return "false";
         }
@@ -831,7 +832,7 @@
             app.alert.show('error_dinero', {
                 level: 'error',
                 autoClose: true,
-                messages: 'El campo no acepta caracteres especiales.'
+                messages: '<b>El campo no acepta caracteres especiales.</b>'
             });
             return "false";
         }
