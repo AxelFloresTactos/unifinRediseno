@@ -603,7 +603,15 @@
               this.model.fields['origen_c'].options = opciones_origen;
           }
         }
-        
+        //READONLY: ORIGEN - MARKETING  / DETALLE ORIGEN - ORGANICO
+        if (this.model.get('origen_c') === '1' && this.model.get('detalle_origen_c') === '80') {            
+            $('[data-name="potencial_lead_c"]').css('pointer-events','none');
+            $('[data-name="activos_interes_c"]').css('pointer-events','none');
+            $('[data-name="mes_operacion_c"]').css('pointer-events','none');
+            $('[data-name="potencial_cierre_c"]').css('pointer-events','none');
+            $('[data-fieldname="prospect_cp_estados_municipios"]').css('pointer-events','none');
+            $('[data-fieldname="prospects_clasf_sectorial"]').css('pointer-events','none');
+        }
     },
 
     deshabilitaOrigen:function(){
