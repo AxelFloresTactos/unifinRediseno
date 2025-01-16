@@ -223,7 +223,7 @@
             var nombre = this.model.get('nombre_c');
             var comprueba = expresion.test(nombre);
             if (comprueba != true) {
-                camponame = camponame + '<b>' + app.lang.get("LBL_NOMBRE", "Prospects") + '</b><br>';
+                camponame = camponame + '<b>' + app.lang.get("LBL_NOMBRE_C", "Prospects") + '</b><br>';
                 errors['nombre_c'] = errors['nombre_c'] || {};
                 errors['nombre_c'].required = true;
             }
