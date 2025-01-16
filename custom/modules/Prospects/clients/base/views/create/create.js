@@ -19,7 +19,8 @@
         this.events['keydown [name=phone_mobile]'] = 'validaSoloNumerosTel';
         this.events['keydown [name=phone_home]'] = 'validaSoloNumerosTel';
         this.events['keydown [name=phone_work]'] = 'validaSoloNumerosTel';
-
+        this.events['keypress [name=telefono_aa_c]'] = 'validaSoloNumerosTel';
+        this.events['keydown [name=telefono_aa_c]'] = 'validaSoloNumerosTel';
         this.model.addValidationTask('check_longDupTel', _.bind(this.validaLongDupTel, this));
         this.model.addValidationTask('check_TextOnly', _.bind(this.checkTextOnly, this));
         this.model.addValidationTask('change:email', _.bind(this.expmail, this));
@@ -503,7 +504,7 @@
             app.alert.show('Caracter_Invalido', {
                 level: 'error',
                 autoClose: true,
-                messages: 'El campo no acepta caracteres especiales.'
+                messages: '<b>Solo números son permitidos en este campo.</b>'
             });
             return false;
         }
