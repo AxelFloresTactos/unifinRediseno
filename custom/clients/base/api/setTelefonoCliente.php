@@ -36,7 +36,7 @@ class setTelefonoCliente extends SugarApi
         global $sugar_config, $db; 
         // Parámetros requeridos
         $requiredParams = ['id_cliente', 'tipotelefono', 'telefono'];
-        $GLOBALS['log']->fatal('Inicia inserción teléfono.');
+        //$GLOBALS['log']->fatal('Inicia inserción teléfono.');
 
         // Validar si la entrada es un solo registro y convertirlo a un formato de arreglo uniforme
         if (isset($inputData['id_cliente'])) {
@@ -48,7 +48,7 @@ class setTelefonoCliente extends SugarApi
             $GLOBALS['log']->fatal('Formato JSON inválido. Se esperaba un objeto o un arreglo de datos.');
             throw new SugarApiExceptionInvalidParameter('Formato JSON inválido. Se esperaba un objeto o un arreglo de datos.');
         }
-        $GLOBALS['log']->fatal($inputData['data']);
+        //$GLOBALS['log']->fatal($inputData['data']);
 
         $response = [];
         foreach ($inputData['data'] as $registro) {
@@ -160,14 +160,14 @@ class setTelefonoCliente extends SugarApi
         AND tel.estatus = 'Activo'
         AND tel.telefono= '".$telefonobusqueda."'";
 
-        $GLOBALS['log']->fatal("sql: " . $sql );
+        //$GLOBALS['log']->fatal("sql: " . $sql );
         try{
             $results = $db->query($sql);
         } catch (Exception $ex) {
             $GLOBALS['log']->fatal("Exception " . $ex);
             $estado = 400;
         }
-        $GLOBALS['log']->fatal("Result Row: " . print_r($results, true));
+        //$GLOBALS['log']->fatal("Result Row: " . print_r($results, true));
         while ($row = $db->fetchByAssoc($results)) {
             $telId = $row['id'];
         }
